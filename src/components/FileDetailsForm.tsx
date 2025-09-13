@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import MintingFlow from './MintingFlow';
+import RequiredFieldsStatus from './RequiredFieldsStatus';
 
 // Comprehensive NFT minting form validation schema
 const formSchema = z.object({
@@ -316,13 +317,16 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
           </div>
         </div>
 
-        {/* Gas Estimate Alert */}
-        <Alert>
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Estimated Gas Cost:</strong> {estimatedGas} • Network fees vary based on congestion
-          </AlertDescription>
-        </Alert>
+        {/* Required Fields Status & Gas Estimate */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <RequiredFieldsStatus form={form} />
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Estimated Gas Cost:</strong> {estimatedGas} • Network fees vary based on congestion
+            </AlertDescription>
+          </Alert>
+        </div>
 
         {previewMode ? (
           /* Preview Mode */
