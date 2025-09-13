@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, File, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import FileDetailsForm from './FileDetailsForm';
+import SimpleFileDetailsForm from './SimpleFileDetailsForm';
 
 interface UploadedFile {
   id: string;
@@ -111,7 +111,7 @@ const FileUpload = () => {
   // Show form if requested and we have files
   if (showForm && files.length > 0) {
     return (
-      <FileDetailsForm 
+      <SimpleFileDetailsForm 
         onSubmit={handleFormSubmit}
         onCancel={handleFormCancel}
       />
