@@ -131,91 +131,95 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
   const [estimatedGas, setEstimatedGas] = useState<string>('~0.05 ETH');
   const [showMintingFlow, setShowMintingFlow] = useState(false);
   const [formData, setFormData] = useState<FormData | null>(null);
+  const [devMode, setDevMode] = useState(false);
+
+  const getDefaultValues = () => ({
+    // Basic Information
+    assetTitle: devMode ? 'Test NFT Asset Title' : '',
+    shortDescription: devMode ? 'This is a test NFT created for development and testing purposes. It demonstrates the minting flow functionality.' : '',
+    categoryTags: devMode ? ['art', 'digital', 'test'] : [],
+    creatorName: devMode ? 'Test Creator' : '',
+    externalLink: devMode ? 'https://example.com/portfolio' : '',
+
+    // Storage & Hosted File Metadata
+    hostedFileUrl: devMode ? 'https://example.com/test-image.jpg' : '',
+    storagePath: devMode ? '/storage/test-nft' : '',
+    ipfsCid: devMode ? 'QmTest123456789' : '',
+    fileChecksum: devMode ? 'sha256:abc123def456' : '',
+    mimeType: devMode ? 'image/jpeg' : '',
+    fileSize: devMode ? 1024000 : 0,
+    thumbnailUrl: devMode ? 'https://example.com/test-thumb.jpg' : '',
+
+    // Token Details
+    tokenStandard: 'ERC-721' as const,
+    supplyEditionSize: devMode ? 1 : 1,
+    editionNumbering: false,
+    editionFormat: '',
+    metadataMutability: 'immutable' as const,
+    tokenName: devMode ? 'TestNFT' : '',
+    tokenSymbol: devMode ? 'TNFT' : '',
+    baseUri: devMode ? 'https://api.example.com/metadata/' : '',
+
+    // Blockchain & Multichain
+    primaryChain: 'ethereum' as const,
+    additionalChains: [] as string[],
+    mintingMode: 'direct' as const,
+    contractChoice: 'new' as const,
+    upgradeability: false,
+
+    // Sales & Listing
+    listOnMarketplace: false,
+    saleType: 'not-for-sale' as const,
+    price: 0,
+    currency: 'ETH' as const,
+    quantityPerBuyer: 1,
+    listingVisibility: 'public' as const,
+
+    // Royalties & Payouts
+    royaltyPercentage: devMode ? 5 : 5,
+    royaltyRecipient: devMode ? '0x742d35Cc123C6f34E05861B22048B456123456789' : '',
+    splitPayments: [] as SplitPayment[],
+    gasFeePayer: 'creator' as const,
+    payoutMethod: 'immediate' as const,
+
+    // Provenance & Authenticity
+    certificateUrl: devMode ? 'https://example.com/certificate' : '',
+    ownershipProof: devMode ? 'Digital signature proof' : '',
+    physicalRedemption: 'none' as const,
+    custodianInfo: '',
+    provenanceNotes: devMode ? 'Created for testing purposes' : '',
+
+    // Access & Licenses
+    unlockableContent: false,
+    unlockUrl: '',
+    licenseType: 'all-rights' as const,
+    customLicense: '',
+    transferRestrictions: 'transferable' as const,
+    commercialUse: 'no' as const,
+
+    // Compliance & Safety
+    kycRequired: false,
+    kycVerifier: '',
+    nsfwFlag: false,
+    jurisdictionTerms: devMode ? true : false,
+    copyrightContact: devMode ? 'test@example.com' : '',
+
+    // Advanced Options
+    customContract: false,
+    ownerAddress: devMode ? '0x742d35Cc123C6f34E05861B22048B456789' : '',
+    maxSupply: devMode ? 1000 : 0,
+    eip2981Enforcement: true,
+    randomnessReveal: false,
+    whitelistCsv: '',
+    batchMinting: false,
+    batchSize: 0,
+    auditRequest: false,
+  });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      // Basic Information
-      assetTitle: '',
-      shortDescription: '',
-      categoryTags: [],
-      creatorName: '',
-      externalLink: '',
+    defaultValues: getDefaultValues(),
 
-      // Storage & Hosted File Metadata
-      hostedFileUrl: '',
-      storagePath: '',
-      ipfsCid: '',
-      fileChecksum: '',
-      mimeType: '',
-      fileSize: 0,
-      thumbnailUrl: '',
-
-      // Token Details
-      tokenStandard: 'ERC-721',
-      supplyEditionSize: 1,
-      editionNumbering: false,
-      editionFormat: '',
-      metadataMutability: 'immutable',
-      tokenName: '',
-      tokenSymbol: '',
-      baseUri: '',
-
-      // Blockchain & Multichain
-      primaryChain: 'ethereum',
-      additionalChains: [],
-      mintingMode: 'direct',
-      contractChoice: 'new',
-      upgradeability: false,
-
-      // Sales & Listing
-      listOnMarketplace: false,
-      saleType: 'not-for-sale',
-      price: 0,
-      currency: 'ETH',
-      quantityPerBuyer: 1,
-      listingVisibility: 'public',
-
-      // Royalties & Payouts
-      royaltyPercentage: 5,
-      royaltyRecipient: '',
-      splitPayments: [],
-      gasFeePayer: 'creator',
-      payoutMethod: 'immediate',
-
-      // Provenance & Authenticity
-      certificateUrl: '',
-      ownershipProof: '',
-      physicalRedemption: 'none',
-      custodianInfo: '',
-      provenanceNotes: '',
-
-      // Access & Licenses
-      unlockableContent: false,
-      unlockUrl: '',
-      licenseType: 'all-rights',
-      customLicense: '',
-      transferRestrictions: 'transferable',
-      commercialUse: 'no',
-
-      // Compliance & Safety
-      kycRequired: false,
-      kycVerifier: '',
-      nsfwFlag: false,
-      jurisdictionTerms: false,
-      copyrightContact: '',
-
-      // Advanced Options
-      customContract: false,
-      ownerAddress: '',
-      maxSupply: 0,
-      eip2981Enforcement: true,
-      randomnessReveal: false,
-      whitelistCsv: '',
-      batchMinting: false,
-      batchSize: 0,
-      auditRequest: false,
-    },
   });
 
   const { fields: splitFields, append: appendSplit, remove: removeSplit } = useFieldArray({
@@ -246,6 +250,34 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
 
   const handleBackFromMinting = () => {
     setShowMintingFlow(false);
+  };
+
+  const fillTestData = () => {
+    setDevMode(true);
+    form.reset(getDefaultValues());
+    toast({
+      title: "Test data filled",
+      description: "All required fields have been populated with test values",
+    });
+  };
+
+  const toggleDevMode = () => {
+    const newDevMode = !devMode;
+    setDevMode(newDevMode);
+    
+    if (newDevMode) {
+      form.reset(getDefaultValues());
+      toast({
+        title: "Dev mode enabled",
+        description: "Form will be pre-filled with test data",
+      });
+    } else {
+      form.reset(getDefaultValues());
+      toast({
+        title: "Dev mode disabled",
+        description: "Form reset to empty values",
+      });
+    }
   };
 
   if (showMintingFlow && formData) {
@@ -298,6 +330,21 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleDevMode}
+              className={devMode ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300' : ''}
+            >
+              {devMode ? 'Dev Mode ON' : 'Dev Mode'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fillTestData}
+            >
+              Fill Test Data
+            </Button>
             <Button
               variant="outline"
               size="sm"
