@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import MintingFlow from './MintingFlow';
 
 // Comprehensive NFT minting form validation schema
 const formSchema = z.object({
@@ -128,6 +129,8 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
   const { toast } = useToast();
   const [previewMode, setPreviewMode] = useState(false);
   const [estimatedGas, setEstimatedGas] = useState<string>('~0.05 ETH');
+  const [showMintingFlow, setShowMintingFlow] = useState(false);
+  const [formData, setFormData] = useState<FormData | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -231,12 +234,29 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
   
   const handleSubmit = (data: FormData) => {
     console.log('NFT Minting Form submitted:', data);
-    toast({
-      title: "NFT Prepared for Minting",
-      description: "Your NFT metadata has been prepared. Ready to deploy to blockchain.",
-    });
-    onSubmit(data);
+    setFormData(data);
+    setShowMintingFlow(true);
   };
+
+  const handleMintingComplete = () => {
+    setShowMintingFlow(false);
+    setFormData(null);
+    onCancel(); // Return to main view
+  };
+
+  const handleBackFromMinting = () => {
+    setShowMintingFlow(false);
+  };
+
+  if (showMintingFlow && formData) {
+    return (
+      <MintingFlow 
+        formData={formData}
+        onComplete={handleMintingComplete}
+        onBack={handleBackFromMinting}
+      />
+    );
+  }
 
   const chainIcons = {
     ethereum: '⟡',
