@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, File, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import FileDetailsForm from './FileDetailsForm';
 
 interface UploadedFile {
   id: string;
@@ -12,6 +13,7 @@ interface UploadedFile {
 const FileUpload = () => {
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState<UploadedFile[]>([]);
+  const [showForm, setShowForm] = useState(false);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -78,7 +80,25 @@ const FileUpload = () => {
 
   const removeFile = (fileId: string) => {
     setFiles(prev => prev.filter(file => file.id !== fileId));
+    // Hide form if no files left
+    if (files.length <= 1) {
+      setShowForm(false);
+    }
   };
+
+  const handleFormSubmit = (data: any) => {
+    console.log('Form data:', data);
+    // Here you would typically send the data to your backend
+    alert('Form submitted successfully!');
+    setShowForm(false);
+  };
+
+  const handleFormCancel = () => {
+    setShowForm(false);
+  };
+
+  // Check if we have any completed files to show the form button
+  const hasCompletedFiles = files.some(file => file.status === 'completed');
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
@@ -87,6 +107,16 @@ const FileUpload = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
+
+  // Show form if requested and we have files
+  if (showForm && files.length > 0) {
+    return (
+      <FileDetailsForm 
+        onSubmit={handleFormSubmit}
+        onCancel={handleFormCancel}
+      />
+    );
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
@@ -192,6 +222,18 @@ const FileUpload = () => {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Form Button - Show when files are completed */}
+      {hasCompletedFiles && !showForm && (
+        <div className="flex justify-center pt-4">
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+          >
+            Add File Details
+          </button>
         </div>
       )}
     </div>
