@@ -15,7 +15,7 @@ import { CalendarIcon, Plus, Trash2, ChevronDown, ChevronUp, Wallet, Upload, Shi
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { TagsInput } from '@/components/ui/tags-input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -388,330 +388,542 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
               
-              <Tabs defaultValue="basic" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                  <TabsTrigger value="token">Token & Blockchain</TabsTrigger>
-                  <TabsTrigger value="sales">Sales & Royalties</TabsTrigger>
-                  <TabsTrigger value="advanced">Legal & Advanced</TabsTrigger>
-                </TabsList>
+              <Accordion type="multiple" defaultValue={["basic", "token", "blockchain"]} className="w-full">
                 
-                {/* Basic Information Tab */}
-                <TabsContent value="basic" className="space-y-6 mt-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <FileText className="w-5 h-5" />
-                        Basic Information
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Asset Title */}
-                        <FormField
-                          control={form.control}
-                          name="assetTitle"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Asset Title *</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Short, human-readable title" {...field} />
-                              </FormControl>
-                              <FormDescription>Short, human-readable. Required, max 120 chars.</FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Creator Name */}
-                        <FormField
-                          control={form.control}
-                          name="creatorName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Creator / Artist Name *</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Auto-fill from profile" {...field} />
-                              </FormControl>
-                              <FormDescription>Shown on token metadata. Required.</FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* External Link */}
-                        <FormField
-                          control={form.control}
-                          name="externalLink"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>External Link / Provenance URL</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="url"
-                                  placeholder="https://portfolio.example.com" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>Portfolio, certificate link, previous sale, etc. (Optional)</FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* Short Description */}
+                {/* Basic Information Section */}
+                <AccordionItem value="basic">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-5 h-5" />
+                      Basic Information
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Asset Title */}
                       <FormField
                         control={form.control}
-                        name="shortDescription"
+                        name="assetTitle"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Short Description *</FormLabel>
+                            <FormLabel>Asset Title *</FormLabel>
                             <FormControl>
-                              <Textarea 
-                                placeholder="Concise description that will appear in metadata and marketplaces..."
-                                className="min-h-[100px]"
+                              <Input placeholder="Short, human-readable title" {...field} />
+                            </FormControl>
+                            <FormDescription>Short, human-readable. Required, max 120 chars.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Creator Name */}
+                      <FormField
+                        control={form.control}
+                        name="creatorName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Creator / Artist Name *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Auto-fill from profile" {...field} />
+                            </FormControl>
+                            <FormDescription>Shown on token metadata. Required.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* External Link */}
+                      <FormField
+                        control={form.control}
+                        name="externalLink"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>External Link / Provenance URL</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="url"
+                                placeholder="https://portfolio.example.com" 
                                 {...field} 
                               />
                             </FormControl>
-                            <FormDescription>Max 1000 characters. Used for metadata and listings.</FormDescription>
+                            <FormDescription>Portfolio, certificate link, previous sale, etc. (Optional)</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
+                    </div>
 
-                      {/* Category Tags */}
+                    {/* Short Description */}
+                    <FormField
+                      control={form.control}
+                      name="shortDescription"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Short Description *</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="1–3 sentence summary of your asset..."
+                              className="min-h-[120px]"
+                              maxLength={1000}
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>1–3 sentence summary. Required, max 1000 chars.</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Category Tags */}
+                    <FormField
+                      control={form.control}
+                      name="categoryTags"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Category / Tags</FormLabel>
+                          <FormControl>
+                            <TagsInput
+                              value={field.value || []}
+                              onChange={field.onChange}
+                              placeholder="art, photo, music, document, collectible, real-world, utility"
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Examples: art, photo, music, document, collectible, real-world, utility. Optional but recommended.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Storage & File Metadata Section */}
+                <AccordionItem value="storage">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Upload className="w-5 h-5" />
+                      Storage & File Metadata
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
-                        name="categoryTags"
+                        name="hostedFileUrl"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Category Tags</FormLabel>
+                            <FormLabel>Hosted File URL (Supabase)</FormLabel>
                             <FormControl>
-                              <TagsInput
-                                value={field.value || []}
-                                onChange={field.onChange}
-                                placeholder="art, digital, collectible"
-                              />
+                              <Input placeholder="Auto-filled after upload" {...field} readOnly />
                             </FormControl>
-                            <FormDescription>Help buyers discover your NFT. Press Enter to add tags.</FormDescription>
+                            <FormDescription>Public URL from Supabase storage</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
 
-                {/* Token & Blockchain Tab */}
-                <TabsContent value="token" className="space-y-6 mt-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Wallet className="w-5 h-5" />
-                        Token & Blockchain Settings
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Token Standard */}
-                        <FormField
-                          control={form.control}
-                          name="tokenStandard"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Token Standard *</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="ERC-721">ERC-721 (Unique NFT)</SelectItem>
-                                  <SelectItem value="ERC-1155">ERC-1155 (Editions)</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      <FormField
+                        control={form.control}
+                        name="ipfsCid"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>IPFS CID (Optional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="QmHash..." {...field} />
+                            </FormControl>
+                            <FormDescription>If pinned to IPFS/Arweave</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                        {/* Supply/Edition Size */}
-                        <FormField
-                          control={form.control}
-                          name="supplyEditionSize"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Supply / Edition Size *</FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="fileChecksum"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>File Checksum (SHA-256)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Auto-computed" {...field} readOnly />
+                            </FormControl>
+                            <FormDescription>For provenance and tamper detection</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="thumbnailUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Thumbnail / Preview URL</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Auto-generated" {...field} />
+                            </FormControl>
+                            <FormDescription>For marketplace listings</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label>MIME Type</Label>
+                        <Input placeholder="image/png" readOnly />
+                        <p className="text-sm text-muted-foreground mt-1">Auto-detected</p>
+                      </div>
+                      <div>
+                        <Label>File Size</Label>
+                        <Input placeholder="2.5 MB" readOnly />
+                        <p className="text-sm text-muted-foreground mt-1">Human readable</p>
+                      </div>
+                      <div>
+                        <Label>Storage Path</Label>
+                        <Input placeholder="assets/user123/file.png" readOnly />
+                        <p className="text-sm text-muted-foreground mt-1">Bucket path</p>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Token Details Section */}
+                <AccordionItem value="token">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Wallet className="w-5 h-5" />
+                      Token Details
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Token Standard */}
+                      <FormField
+                        control={form.control}
+                        name="tokenStandard"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Token Standard *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <Input 
-                                  type="number" 
-                                  placeholder="1"
-                                  {...field}
-                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                                />
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
                               </FormControl>
-                              <FormDescription>
-                                {watchTokenStandard === 'ERC-721' ? '1 = unique NFT' : 'Number of editions (max 10,000)'}
-                              </FormDescription>
+                              <SelectContent>
+                                <SelectItem value="ERC-721">ERC-721 (Unique NFT)</SelectItem>
+                                <SelectItem value="ERC-1155">ERC-1155 (Editions)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Supply/Edition Size */}
+                      <FormField
+                        control={form.control}
+                        name="supplyEditionSize"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Supply / Edition Size *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                placeholder="1"
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              {watchTokenStandard === 'ERC-721' ? '1 = unique NFT' : 'Number of editions (max 10,000)'}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Metadata Mutability */}
+                      <FormField
+                        control={form.control}
+                        name="metadataMutability"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Metadata Mutability</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="immutable">
+                                  <div className="flex items-center gap-2">
+                                    <Lock className="w-4 h-4" />
+                                    Immutable (Recommended)
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="mutable">Mutable (Can be updated)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormDescription>Immutable recommended for authenticity</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Edition Numbering */}
+                    <FormField
+                      control={form.control}
+                      name="editionNumbering"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Enable Edition Numbering</FormLabel>
+                            <FormDescription>
+                              Show numbering like "3/100" when editions greater than 1
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Collection Details */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Collection Details (if creating new)</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="tokenName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Collection Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="My NFT Collection" {...field} />
+                              </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
 
-                        {/* Primary Chain */}
                         <FormField
                           control={form.control}
-                          name="primaryChain"
+                          name="tokenSymbol"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Primary Chain *</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="ethereum">
-                                    <div className="flex items-center gap-2">
-                                      <span>{chainIcons.ethereum}</span> Ethereum Mainnet
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem value="polygon">
-                                    <div className="flex items-center gap-2">
-                                      <span>{chainIcons.polygon}</span> Polygon
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem value="bnb">
-                                    <div className="flex items-center gap-2">
-                                      <span>{chainIcons.bnb}</span> BNB Smart Chain
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem value="arbitrum">
-                                    <div className="flex items-center gap-2">
-                                      <span>{chainIcons.arbitrum}</span> Arbitrum One
-                                    </div>
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Minting Mode */}
-                        <FormField
-                          control={form.control}
-                          name="mintingMode"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Minting Mode *</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="direct">Direct Minting (Immediate)</SelectItem>
-                                  <SelectItem value="lazy">Lazy Minting (On Purchase)</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormDescription>Direct = mint now, Lazy = mint when sold</FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Contract Choice */}
-                        <FormField
-                          control={form.control}
-                          name="contractChoice"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Contract Choice *</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="existing">Use Existing Contract</SelectItem>
-                                  <SelectItem value="new">Deploy New Contract</SelectItem>
-                                  <SelectItem value="factory">Factory Contract</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Metadata Mutability */}
-                        <FormField
-                          control={form.control}
-                          name="metadataMutability"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Metadata Mutability</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="immutable">Immutable (Frozen)</SelectItem>
-                                  <SelectItem value="mutable">Mutable (Updatable)</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormDescription>Immutable = permanent, Mutable = can be updated</FormDescription>
+                              <FormLabel>Collection Symbol</FormLabel>
+                              <FormControl>
+                                <Input placeholder="MNC" {...field} />
+                              </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                       </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
 
-                {/* Sales & Royalties Tab */}
-                <TabsContent value="sales" className="space-y-6 mt-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <DollarSign className="w-5 h-5" />
-                        Sales & Royalties
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      {/* List on Marketplace */}
+                {/* Blockchain & Multichain Section */}
+                <AccordionItem value="blockchain">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-5 h-5" />
+                      Blockchain & Multichain
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Primary Chain */}
                       <FormField
                         control={form.control}
-                        name="listOnMarketplace"
+                        name="primaryChain"
                         render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                              <FormLabel className="text-base">
-                                List on Marketplace After Minting
-                              </FormLabel>
-                              <FormDescription>
-                                Automatically list your NFT for sale
-                              </FormDescription>
-                            </div>
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
+                          <FormItem>
+                            <FormLabel>Primary Chain to Mint On *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="ethereum">
+                                  <div className="flex items-center gap-2">
+                                    <span>{chainIcons.ethereum}</span>
+                                    Ethereum
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="polygon">
+                                  <div className="flex items-center gap-2">
+                                    <span>{chainIcons.polygon}</span>
+                                    Polygon
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="bnb">
+                                  <div className="flex items-center gap-2">
+                                    <span>{chainIcons.bnb}</span>
+                                    BNB Chain
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="solana">
+                                  <div className="flex items-center gap-2">
+                                    <span>{chainIcons.solana}</span>
+                                    Solana
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="avalanche">
+                                  <div className="flex items-center gap-2">
+                                    <span>{chainIcons.avalanche}</span>
+                                    Avalanche
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="arbitrum">
+                                  <div className="flex items-center gap-2">
+                                    <span>{chainIcons.arbitrum}</span>
+                                    Arbitrum
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="optimism">
+                                  <div className="flex items-center gap-2">
+                                    <span>{chainIcons.optimism}</span>
+                                    Optimism
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      {watchListOnMarketplace && (
+                      {/* Minting Mode */}
+                      <FormField
+                        control={form.control}
+                        name="mintingMode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Minting Mode *</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-1"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="direct" id="direct" />
+                                  <Label htmlFor="direct">Direct mint (immediate on-chain - creator pays gas)</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="lazy" id="lazy" />
+                                  <Label htmlFor="lazy">Lazy mint (off-chain metadata - buyer pays gas)</Label>
+                                </div>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Contract Choice */}
+                      <FormField
+                        control={form.control}
+                        name="contractChoice"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contract Choice *</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-1"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="existing" id="existing" />
+                                  <Label htmlFor="existing">Mint under existing collection</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="new" id="new" />
+                                  <Label htmlFor="new">Deploy new collection/contract</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="factory" id="factory" />
+                                  <Label htmlFor="factory">Use factory (managed multi-deploy)</Label>
+                                </div>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Upgradeability */}
+                    <FormField
+                      control={form.control}
+                      name="upgradeability"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Upgradeability / Proxy (Advanced)</FormLabel>
+                            <FormDescription>
+                              Allows contract upgrades - adds complexity and risk
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Sales & Listing Section */}
+                <AccordionItem value="sales">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5" />
+                      Sales & Listing Options
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    {/* List on Marketplace */}
+                    <FormField
+                      control={form.control}
+                      name="listOnMarketplace"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>List on marketplace now?</FormLabel>
+                            <FormDescription>
+                              Enable to configure sale options below
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    {watchListOnMarketplace && (
+                      <div className="space-y-6 border-l-2 border-primary/20 pl-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {/* Sale Type */}
                           <FormField
@@ -720,7 +932,7 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Sale Type</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger>
                                       <SelectValue />
@@ -728,8 +940,36 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                                   </FormControl>
                                   <SelectContent>
                                     <SelectItem value="fixed">Fixed Price</SelectItem>
-                                    <SelectItem value="auction">Timed Auction</SelectItem>
+                                    <SelectItem value="auction">Auction (English/Dutch)</SelectItem>
                                     <SelectItem value="not-for-sale">Not for Sale</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          {/* Currency */}
+                          <FormField
+                            control={form.control}
+                            name="currency"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Currency</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="ETH">ETH - Ethereum</SelectItem>
+                                    <SelectItem value="MATIC">MATIC - Polygon</SelectItem>
+                                    <SelectItem value="BNB">BNB - BNB Chain</SelectItem>
+                                    <SelectItem value="SOL">SOL - Solana</SelectItem>
+                                    <SelectItem value="AVAX">AVAX - Avalanche</SelectItem>
+                                    <SelectItem value="USDC">USDC - Stablecoin</SelectItem>
+                                    <SelectItem value="USDT">USDT - Stablecoin</SelectItem>
                                   </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -743,40 +983,40 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                             name="price"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Price</FormLabel>
+                                <FormLabel>Price / Reserve Price</FormLabel>
                                 <FormControl>
                                   <Input 
                                     type="number" 
                                     step="0.001"
-                                    placeholder="0.1"
+                                    placeholder="0.05"
                                     {...field}
                                     onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                   />
                                 </FormControl>
+                                <FormDescription>Positive numeric value</FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
 
-                          {/* Currency */}
+                          {/* Listing Visibility */}
                           <FormField
                             control={form.control}
-                            name="currency"
+                            name="listingVisibility"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Currency</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
+                                <FormLabel>Listing Visibility</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger>
                                       <SelectValue />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="ETH">ETH</SelectItem>
-                                    <SelectItem value="MATIC">MATIC</SelectItem>
-                                    <SelectItem value="BNB">BNB</SelectItem>
-                                    <SelectItem value="USDC">USDC</SelectItem>
-                                    <SelectItem value="USDT">USDT</SelectItem>
+                                    <SelectItem value="public">Public</SelectItem>
+                                    <SelectItem value="unlisted">Unlisted</SelectItem>
+                                    <SelectItem value="private">Private</SelectItem>
+                                    <SelectItem value="whitelist">Whitelist Only</SelectItem>
                                   </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -784,79 +1024,430 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                             )}
                           />
                         </div>
-                      )}
 
-                      <Separator />
-
-                      {/* Royalty Settings */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Royalty Settings</h3>
+                        {/* Sale Dates */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Royalty Percentage */}
                           <FormField
                             control={form.control}
-                            name="royaltyPercentage"
+                            name="saleStartDate"
                             render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Royalty Percentage *</FormLabel>
-                                <FormControl>
-                                  <Input 
-                                    type="number" 
-                                    min="0"
-                                    max="20"
-                                    step="0.5"
-                                    placeholder="5"
-                                    {...field}
-                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                                  />
-                                </FormControl>
-                                <FormDescription>0-20% (recommended: 2.5-10%)</FormDescription>
+                              <FormItem className="flex flex-col">
+                                <FormLabel>Sale Start Date</FormLabel>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <FormControl>
+                                      <Button
+                                        variant="outline"
+                                        className={cn(
+                                          "pl-3 text-left font-normal",
+                                          !field.value && "text-muted-foreground"
+                                        )}
+                                      >
+                                        {field.value ? (
+                                          format(field.value, "PPP")
+                                        ) : (
+                                          <span>Select start date</span>
+                                        )}
+                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                      </Button>
+                                    </FormControl>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                      mode="single"
+                                      selected={field.value}
+                                      onSelect={field.onChange}
+                                      initialFocus
+                                      className="pointer-events-auto"
+                                    />
+                                  </PopoverContent>
+                                </Popover>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
 
-                          {/* Royalty Recipient */}
                           <FormField
                             control={form.control}
-                            name="royaltyRecipient"
+                            name="saleEndDate"
                             render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Royalty Recipient Address *</FormLabel>
-                                <FormControl>
-                                  <Input 
-                                    placeholder="0x..."
-                                    {...field} 
-                                  />
-                                </FormControl>
-                                <FormDescription>Wallet address to receive royalties</FormDescription>
+                              <FormItem className="flex flex-col">
+                                <FormLabel>Sale End Date</FormLabel>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <FormControl>
+                                      <Button
+                                        variant="outline"
+                                        className={cn(
+                                          "pl-3 text-left font-normal",
+                                          !field.value && "text-muted-foreground"
+                                        )}
+                                      >
+                                        {field.value ? (
+                                          format(field.value, "PPP")
+                                        ) : (
+                                          <span>Select end date</span>
+                                        )}
+                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                      </Button>
+                                    </FormControl>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                      mode="single"
+                                      selected={field.value}
+                                      onSelect={field.onChange}
+                                      initialFocus
+                                      className="pointer-events-auto"
+                                    />
+                                  </PopoverContent>
+                                </Popover>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
 
-                {/* Legal & Advanced Tab */}
-                <TabsContent value="advanced" className="space-y-6 mt-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Shield className="w-5 h-5" />
-                        Legal & Advanced Options
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
+                {/* Royalties Section */}
+                <AccordionItem value="royalties">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5" />
+                      Royalties, Splits & Payouts
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Royalty Percentage */}
+                      <FormField
+                        control={form.control}
+                        name="royaltyPercentage"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Royalty Percentage *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                min="0"
+                                max="20"
+                                step="0.1"
+                                placeholder="5"
+                                {...field}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <FormDescription>Industry norm 2-10%. UI capped at 20%</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Royalty Recipient */}
+                      <FormField
+                        control={form.control}
+                        name="royaltyRecipient"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Royalty Recipient Address *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="0x..." {...field} />
+                            </FormControl>
+                            <FormDescription>Wallet address to receive royalties</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Gas Fee Payer */}
+                      <FormField
+                        control={form.control}
+                        name="gasFeePayer"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Who Pays Minting/Gas Fees?</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="creator">Creator Pays</SelectItem>
+                                <SelectItem value="buyer">Buyer Pays (Lazy)</SelectItem>
+                                <SelectItem value="platform">Platform Subsidizes</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Payout Method */}
+                      <FormField
+                        control={form.control}
+                        name="payoutMethod"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Payout Schedule / Method</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="immediate">Immediate</SelectItem>
+                                <SelectItem value="delayed">Delayed</SelectItem>
+                                <SelectItem value="escrow">Escrow</SelectItem>
+                                <SelectItem value="multisig">Multi-sig</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Split Payments */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">Split Payments / Beneficiaries</h4>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => appendSplit({ address: '', percentage: 0 })}
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Split
+                        </Button>
+                      </div>
+                      
+                      {splitFields.map((field, index) => (
+                        <div key={field.id} className="flex items-end gap-4 p-4 border rounded-lg">
+                          <FormField
+                            control={form.control}
+                            name={`splitPayments.${index}.address`}
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel>Recipient Address</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="0x..." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name={`splitPayments.${index}.percentage`}
+                            render={({ field }) => (
+                              <FormItem className="w-32">
+                                <FormLabel>Share %</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    placeholder="25"
+                                    {...field}
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeSplit(index)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      
+                      {splitFields.length > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          Note: All shares must sum to 100%
+                        </p>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Provenance & Authenticity Section */}
+                <AccordionItem value="provenance">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-5 h-5" />
+                      Provenance, Authenticity & Certificates
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="certificateUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Certificate of Authenticity URL</FormLabel>
+                            <FormControl>
+                              <Input placeholder="https://certificates.example.com/cert123" {...field} />
+                            </FormControl>
+                            <FormDescription>Link to stored PDF or external verifier</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="ownershipProof"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Ownership Proof / Serial Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="For physical assets" {...field} />
+                            </FormControl>
+                            <FormDescription>Serial number or ownership documentation</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Physical Redemption */}
+                    <FormField
+                      control={form.control}
+                      name="physicalRedemption"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Physical Redemption / Custody Options</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="none" id="none" />
+                                <Label htmlFor="none">Digital only</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="redeemable" id="redeemable" />
+                                <Label htmlFor="redeemable">Redeemable for physical item</Label>
+                              </div>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {watchPhysicalRedemption === 'redeemable' && (
+                      <FormField
+                        control={form.control}
+                        name="custodianInfo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Custodian & Shipping Rules</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Custodian details, shipping rules, redemption process..."
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    <FormField
+                      control={form.control}
+                      name="provenanceNotes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Provenance Notes / Prior Owners</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Historical ownership, exhibition history, etc..."
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>Optional historical information</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Access & Licenses Section */}
+                <AccordionItem value="access">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-5 h-5" />
+                      Access, Unlockable Content & Licenses
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    {/* Unlockable Content */}
+                    <FormField
+                      control={form.control}
+                      name="unlockableContent"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Unlockable Content After Purchase</FormLabel>
+                            <FormDescription>
+                              Provide exclusive content only accessible to NFT owners
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    {watchUnlockableContent && (
+                      <FormField
+                        control={form.control}
+                        name="unlockUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Unlock URL / Decryption Metadata</FormLabel>
+                            <FormControl>
+                              <Input placeholder="https://exclusive.example.com/content" {...field} />
+                            </FormControl>
+                            <FormDescription>Supabase path with access rules or external URL</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* License Type */}
                       <FormField
                         control={form.control}
                         name="licenseType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>License Type</FormLabel>
+                            <FormLabel>License / Usage Rights</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -865,53 +1456,10 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                               </FormControl>
                               <SelectContent>
                                 <SelectItem value="all-rights">All Rights Reserved</SelectItem>
-                                <SelectItem value="non-commercial">Non-Commercial Use</SelectItem>
-                                <SelectItem value="cc0">CC0 (Public Domain)</SelectItem>
-                                <SelectItem value="cc-by">CC BY (Attribution)</SelectItem>
+                                <SelectItem value="non-commercial">Non-commercial Use</SelectItem>
+                                <SelectItem value="cc0">Creative Commons CC0</SelectItem>
+                                <SelectItem value="cc-by">Creative Commons CC BY</SelectItem>
                                 <SelectItem value="custom">Custom License</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {watchLicenseType === 'custom' && (
-                        <FormField
-                          control={form.control}
-                          name="customLicense"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Custom License Terms</FormLabel>
-                              <FormControl>
-                                <Textarea 
-                                  placeholder="Enter your custom license terms..."
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-
-                      {/* Commercial Use */}
-                      <FormField
-                        control={form.control}
-                        name="commercialUse"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Commercial Use Permission</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="yes">Yes, allow commercial use</SelectItem>
-                                <SelectItem value="no">No commercial use</SelectItem>
-                                <SelectItem value="contact">Contact for permission</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -933,34 +1481,99 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="transferable">Freely Transferable</SelectItem>
-                                <SelectItem value="restricted">Transfer Restricted</SelectItem>
+                                <SelectItem value="transferable">Transferable</SelectItem>
+                                <SelectItem value="restricted">Restricted Transfer</SelectItem>
                                 <SelectItem value="soulbound">Soulbound (Non-transferable)</SelectItem>
                               </SelectContent>
                             </Select>
+                            <FormDescription>Soulbound requires contract support</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      <Separator />
-
-                      {/* Copyright Contact */}
+                      {/* Commercial Use */}
                       <FormField
                         control={form.control}
-                        name="copyrightContact"
+                        name="commercialUse"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Copyright Contact Email</FormLabel>
+                            <FormLabel>Commercial Use Allowed?</FormLabel>
                             <FormControl>
-                              <Input 
-                                type="email"
-                                placeholder="copyright@example.com"
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-1"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="yes" id="comm-yes" />
+                                  <Label htmlFor="comm-yes">Yes</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="no" id="comm-no" />
+                                  <Label htmlFor="comm-no">No</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="contact" id="comm-contact" />
+                                  <Label htmlFor="comm-contact">Contact for License</Label>
+                                </div>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {watchLicenseType === 'custom' && (
+                      <FormField
+                        control={form.control}
+                        name="customLicense"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Custom License Text</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Enter your custom license terms..."
                                 {...field} 
                               />
                             </FormControl>
-                            <FormDescription>For copyright claims and inquiries</FormDescription>
                             <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Compliance & Safety Section */}
+                <AccordionItem value="compliance">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-5 h-5" />
+                      Compliance, Identity & Safety
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* KYC Required */}
+                      <FormField
+                        control={form.control}
+                        name="kycRequired"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>KYC Required to Mint or Purchase</FormLabel>
+                              <FormDescription>
+                                Require identity verification
+                              </FormDescription>
+                            </div>
                           </FormItem>
                         )}
                       />
@@ -970,57 +1583,7 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                         control={form.control}
                         name="nsfwFlag"
                         render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                              <FormLabel className="text-base">
-                                NSFW Content Warning
-                              </FormLabel>
-                              <FormDescription>
-                                Check if content is not safe for work
-                              </FormDescription>
-                            </div>
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* KYC Required */}
-                      <FormField
-                        control={form.control}
-                        name="kycRequired"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                              <FormLabel className="text-base">
-                                KYC Required for Purchase
-                              </FormLabel>
-                              <FormDescription>
-                                Require buyer identity verification
-                              </FormDescription>
-                            </div>
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-
-                      <Separator />
-
-                      {/* Legal Terms Acceptance */}
-                      <FormField
-                        control={form.control}
-                        name="jurisdictionTerms"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                             <FormControl>
                               <Checkbox
                                 checked={field.value}
@@ -1028,22 +1591,280 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                               />
                             </FormControl>
                             <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Legal Terms & Compliance *
-                              </FormLabel>
+                              <FormLabel>Content Safety / NSFW Flag</FormLabel>
                               <FormDescription>
-                                I confirm that I have the right to mint this NFT and agree to the platform's terms of service, 
-                                applicable laws, and regulations in my jurisdiction.
+                                Triggers gating or restricted visibility
                               </FormDescription>
-                              <FormMessage />
                             </div>
                           </FormItem>
                         )}
                       />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
+                    </div>
+
+                    {watchKycRequired && (
+                      <FormField
+                        control={form.control}
+                        name="kycVerifier"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>KYC Verifier & Required Fields</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Specify verifier and required information" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    <FormField
+                      control={form.control}
+                      name="copyrightContact"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Copyright Dispute Contact</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="legal@example.com" {...field} />
+                          </FormControl>
+                          <FormDescription>Email for copyright-related inquiries</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Terms Acceptance */}
+                    <FormField
+                      control={form.control}
+                      name="jurisdictionTerms"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Jurisdiction / Legal Terms Acceptance *</FormLabel>
+                            <FormDescription>
+                              I confirm I own rights to tokenize this asset or have permission
+                            </FormDescription>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Advanced Options Section */}
+                <AccordionItem value="advanced">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      Advanced / Developer Options
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-6 pt-4">
+                    <Alert>
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription>
+                        Advanced options require technical knowledge. Proceed with caution.
+                      </AlertDescription>
+                    </Alert>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* EIP-2981 Enforcement */}
+                      <FormField
+                        control={form.control}
+                        name="eip2981Enforcement"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>EIP-2981 (Royalty Standard) Enforcement</FormLabel>
+                              <FormDescription>
+                                Enforce royalties via contract standard
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Randomness/Reveal */}
+                      <FormField
+                        control={form.control}
+                        name="randomnessReveal"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>Randomness / Reveal Mechanics</FormLabel>
+                              <FormDescription>
+                                Chainlink VRF or server-signed reveal
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Batch Minting */}
+                      <FormField
+                        control={form.control}
+                        name="batchMinting"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>Batch Minting Options</FormLabel>
+                              <FormDescription>
+                                Enable batch processing for multiple tokens
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Audit Request */}
+                      <FormField
+                        control={form.control}
+                        name="auditRequest"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>Audit Request</FormLabel>
+                              <FormDescription>
+                                Request contract audit before public mint
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {watchBatchMinting && (
+                      <FormField
+                        control={form.control}
+                        name="batchSize"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Batch Size</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number"
+                                placeholder="100"
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <FormDescription>Number of tokens per batch</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    {/* Custom Contract Parameters */}
+                    <FormField
+                      control={form.control}
+                      name="customContract"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Custom Contract Parameters</FormLabel>
+                            <FormDescription>
+                              Override default contract settings
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    {watchCustomContract && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="ownerAddress"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Owner Address</FormLabel>
+                              <FormControl>
+                                <Input placeholder="0x..." {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="maxSupply"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Max Supply</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number"
+                                  placeholder="10000"
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {/* Whitelist Upload */}
+                    <FormField
+                      control={form.control}
+                      name="whitelistCsv"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Whitelist / Allowlist Upload</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Paste CSV data or upload file with addresses and allocations..."
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription>CSV format: address, allocation</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
               {/* Submit Section */}
               <Card>
