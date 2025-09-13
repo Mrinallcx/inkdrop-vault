@@ -341,9 +341,9 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                           <FormItem>
                             <FormLabel>Asset Title *</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Cosmic Adventure #1" {...field} />
+                              <Input placeholder="Short, human-readable title" {...field} />
                             </FormControl>
-                            <FormDescription>Short, human-readable title (max 120 chars)</FormDescription>
+                            <FormDescription>Short, human-readable. Required, max 120 chars.</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -357,9 +357,9 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                           <FormItem>
                             <FormLabel>Creator / Artist Name *</FormLabel>
                             <FormControl>
-                              <Input placeholder="Artist or creator name" {...field} />
+                              <Input placeholder="Auto-fill from profile" {...field} />
                             </FormControl>
-                            <FormDescription>Shown on token metadata</FormDescription>
+                            <FormDescription>Shown on token metadata. Required.</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -373,9 +373,13 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                           <FormItem>
                             <FormLabel>External Link / Provenance URL</FormLabel>
                             <FormControl>
-                              <Input placeholder="https://portfolio.example.com" {...field} />
+                              <Input 
+                                type="url"
+                                placeholder="https://portfolio.example.com" 
+                                {...field} 
+                              />
                             </FormControl>
-                            <FormDescription>Portfolio, certificate, or previous sale link</FormDescription>
+                            <FormDescription>Portfolio, certificate link, previous sale, etc. (Optional)</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -391,12 +395,13 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                           <FormLabel>Short Description *</FormLabel>
                           <FormControl>
                             <Textarea 
-                              placeholder="1-3 sentence summary of your asset..."
+                              placeholder="1–3 sentence summary of your asset..."
                               className="min-h-[120px]"
+                              maxLength={1000}
                               {...field} 
                             />
                           </FormControl>
-                          <FormDescription>Brief description (max 1000 chars)</FormDescription>
+                          <FormDescription>1–3 sentence summary. Required, max 1000 chars.</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -413,11 +418,11 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                             <TagsInput
                               value={field.value || []}
                               onChange={field.onChange}
-                              placeholder="art, photo, music, collectible..."
+                              placeholder="art, photo, music, document, collectible, real-world, utility"
                             />
                           </FormControl>
                           <FormDescription>
-                            Optional but recommended: art, photo, music, document, collectible, utility
+                            Examples: art, photo, music, document, collectible, real-world, utility. Optional but recommended.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
