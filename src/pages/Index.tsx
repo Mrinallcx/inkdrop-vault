@@ -1,8 +1,12 @@
 import FileUpload from '@/components/FileUpload';
+import Navbar from '@/components/Navbar';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Navbar */}
+      <Navbar />
+      
       {/* Main Content - Centered */}
       <main className="flex-1 flex items-center justify-center px-6 py-12">
         <FileUpload />
