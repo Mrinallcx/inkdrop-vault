@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Upload, File, X } from 'lucide-react';
+import { Upload, File, X, Image, Music, Video } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import FileDetailsForm from './FileDetailsForm';
 
@@ -42,20 +42,96 @@ const FileUpload = () => {
     }
   };
 
+  const validateFile = (file: File): { isValid: boolean; error?: string } => {
+    const fileType = file.type.toLowerCase();
+    const fileSize = file.size;
+    
+    // Define file type categories and size limits
+    const isImage = fileType.startsWith('image/');
+    const isAudio = fileType.startsWith('audio/');
+    const isVideo = fileType.startsWith('video/');
+    
+    // Check if file type is supported
+    if (!isImage && !isAudio && !isVideo) {
+      return { isValid: false, error: 'Only image, audio, and video files are supported' };
+    }
+    
+    // Check file size limits
+    const maxSizes = {
+      image: 10 * 1024 * 1024, // 10MB
+      audio: 50 * 1024 * 1024, // 50MB
+      video: 1024 * 1024 * 1024, // 1GB
+    };
+    
+    let maxSize = 0;
+    let fileTypeText = '';
+    
+    if (isImage) {
+      maxSize = maxSizes.image;
+      fileTypeText = 'Image';
+    } else if (isAudio) {
+      maxSize = maxSizes.audio;
+      fileTypeText = 'Audio';
+    } else if (isVideo) {
+      maxSize = maxSizes.video;
+      fileTypeText = 'Video';
+    }
+    
+    if (fileSize > maxSize) {
+      const maxSizeText = formatFileSize(maxSize);
+      return { isValid: false, error: `${fileTypeText} files must be smaller than ${maxSizeText}` };
+    }
+    
+    return { isValid: true };
+  };
+
+  const getFileIcon = (file: File) => {
+    const fileType = file.type.toLowerCase();
+    
+    if (fileType.startsWith('image/')) {
+      return <Image className="w-5 h-5 text-blue-500" />;
+    } else if (fileType.startsWith('audio/')) {
+      return <Music className="w-5 h-5 text-green-500" />;
+    } else if (fileType.startsWith('video/')) {
+      return <Video className="w-5 h-5 text-purple-500" />;
+    }
+    
+    return <File className="w-5 h-5 text-muted-foreground" />;
+  };
+
   const handleFiles = (fileList: FileList) => {
-    const newFiles: UploadedFile[] = Array.from(fileList).map(file => ({
-      id: Math.random().toString(36).substr(2, 9),
-      file,
-      progress: 0,
-      status: 'uploading'
-    }));
+    const validFiles: UploadedFile[] = [];
+    const errors: string[] = [];
     
-    setFiles(prev => [...prev, ...newFiles]);
-    
-    // Simulate upload progress
-    newFiles.forEach(uploadedFile => {
-      simulateUpload(uploadedFile.id);
+    Array.from(fileList).forEach(file => {
+      const validation = validateFile(file);
+      
+      if (validation.isValid) {
+        validFiles.push({
+          id: Math.random().toString(36).substr(2, 9),
+          file,
+          progress: 0,
+          status: 'uploading'
+        });
+      } else {
+        errors.push(`${file.name}: ${validation.error}`);
+      }
     });
+    
+    // Show errors if any
+    if (errors.length > 0) {
+      alert(`Some files were rejected:\n${errors.join('\n')}`);
+    }
+    
+    // Add valid files
+    if (validFiles.length > 0) {
+      setFiles(prev => [...prev, ...validFiles]);
+      
+      // Simulate upload progress
+      validFiles.forEach(uploadedFile => {
+        simulateUpload(uploadedFile.id);
+      });
+    }
   };
 
   const simulateUpload = (fileId: string) => {
@@ -136,6 +212,7 @@ const FileUpload = () => {
         <input
           type="file"
           multiple
+          accept="image/*,audio/*,video/*"
           onChange={handleChange}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
@@ -156,7 +233,7 @@ const FileUpload = () => {
               Drag and drop files here, or click to browse
             </p>
             <p className="text-sm text-muted-foreground">
-              Supports all file types • Up to 10MB per file
+              Images (up to 10MB) • Audio (up to 50MB) • Video (up to 1GB)
             </p>
           </div>
         </div>
@@ -174,7 +251,7 @@ const FileUpload = () => {
                 className="flex items-center gap-3 p-4 bg-card border rounded-lg hover:bg-muted/50 transition-colors"
               >
                 <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
-                  <File className="w-5 h-5 text-muted-foreground" />
+                  {getFileIcon(uploadedFile.file)}
                 </div>
                 
                 <div className="flex-1 min-w-0">
