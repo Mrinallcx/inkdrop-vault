@@ -60,10 +60,15 @@ export const useUserProfile = () => {
 
       if (authData?.session) {
         // Set the session in Supabase client
-        await supabase.auth.setSession({
+        const { error: sessionError } = await supabase.auth.setSession({
           access_token: authData.session.access_token,
-          refresh_token: '', // Not needed for our use case
+          refresh_token: authData.session.refresh_token || '',
         });
+
+        if (sessionError) {
+          console.error('Failed to set session:', sessionError);
+          throw sessionError;
+        }
       }
 
       setProfile(authData?.profile || null);

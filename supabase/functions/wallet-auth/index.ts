@@ -98,13 +98,15 @@ serve(async (req) => {
       );
     }
 
-    // Generate access token
-    const { data: tokenData, error: tokenError } = await supabase.auth.admin.generateAccessToken(authUser.id);
+    // Generate access token and create session
+    const { data: sessionData, error: sessionError } = await supabase.auth.admin.generateAccessToken(authUser.id, {
+      expiresIn: '1 hour'
+    });
 
-    if (tokenError) {
-      console.error('Token generation error:', tokenError);
+    if (sessionError) {
+      console.error('Session generation error:', sessionError);
       return new Response(
-        JSON.stringify({ error: 'Failed to generate access token' }),
+        JSON.stringify({ error: 'Failed to generate session' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -116,7 +118,10 @@ serve(async (req) => {
       JSON.stringify({ 
         profile,
         session: {
-          access_token: tokenData,
+          access_token: sessionData.access_token,
+          refresh_token: sessionData.refresh_token || '',
+          expires_in: 3600,
+          token_type: 'bearer',
           user: authUser
         }
       }),
