@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, X, Save, Info, FileText } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Upload, X, Save, Info, FileText, CalendarIcon } from 'lucide-react';
 import { TagsInput } from '@/components/ui/tags-input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -24,6 +27,7 @@ const formSchema = z.object({
   categoryTags: z.array(z.string()).optional(),
   creatorName: z.string().min(1, 'Creator name is required'),
   organizationName: z.string().optional(),
+  creationDate: z.date().optional(),
   externalLink: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   externalLink2: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   
@@ -57,6 +61,7 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
       categoryTags: [],
       creatorName: '',
       organizationName: '',
+      creationDate: undefined,
       externalLink: '',
       externalLink2: '',
       
@@ -231,6 +236,48 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                               <Input placeholder="Company or organization name" {...field} />
                             </FormControl>
                             <FormDescription>Optional. Organization associated with this NFT.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* NFT Creation Date */}
+                      <FormField
+                        control={form.control}
+                        name="creationDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>NFT Creation Date</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    className="w-full pl-3 text-left font-normal"
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "PPP")
+                                    ) : (
+                                      <span className="text-muted-foreground">Pick a date</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) => date > new Date()}
+                                  initialFocus
+                                  className="p-3 pointer-events-auto"
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormDescription>
+                              The date when this NFT was originally created (Optional)
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
