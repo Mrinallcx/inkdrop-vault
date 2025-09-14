@@ -134,10 +134,7 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
       <div className="bg-card border rounded-xl p-8 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-              <Upload className="w-5 h-5 text-primary" />
-            </div>
+          <div>
             <div>
               <h2 className="text-2xl font-bold">Tokenize your asset</h2>
             </div>
