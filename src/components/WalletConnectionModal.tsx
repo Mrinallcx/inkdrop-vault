@@ -65,7 +65,7 @@ const WalletConnectionModal = ({ open, onOpenChange }: WalletConnectionModalProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="mx-4 sm:mx-0 sm:max-w-md max-w-sm">
         <DialogHeader className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Wallet className="h-6 w-6 text-primary" />
@@ -85,28 +85,28 @@ const WalletConnectionModal = ({ open, onOpenChange }: WalletConnectionModalProp
                 key={wallet.id}
                 variant="outline"
                 className={cn(
-                  "w-full h-auto p-4 justify-start gap-4 hover:bg-accent/50",
+                  "w-full h-auto p-3 sm:p-4 justify-start gap-3 sm:gap-4 hover:bg-accent/50",
                   !installed && "opacity-75"
                 )}
                 onClick={() => handleWalletConnect(wallet)}
                 disabled={isConnecting}
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-xl">
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-muted text-lg sm:text-xl flex-shrink-0">
                   {wallet.icon}
                 </div>
-                <div className="flex-1 text-left">
+                <div className="flex-1 text-left min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{wallet.name}</span>
+                    <span className="font-medium text-sm sm:text-base truncate">{wallet.name}</span>
                     {!installed && (
-                      <Download className="h-4 w-4 text-muted-foreground" />
+                      <Download className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                     {installed ? wallet.description : 'Click to install'}
                   </p>
                 </div>
                 {isConnecting && (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" />
                 )}
               </Button>
             );

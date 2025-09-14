@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, File, X, Image, Music, Video } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useWallet } from '@/contexts/WalletContext';
 import FileDetailsForm from './FileDetailsForm';
 
 interface UploadedFile {
@@ -10,7 +11,12 @@ interface UploadedFile {
   status: 'uploading' | 'completed' | 'error';
 }
 
-const FileUpload = () => {
+interface FileUploadProps {
+  onRequireWallet?: () => void;
+}
+
+const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
+  const { wallet } = useWallet();
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -100,6 +106,12 @@ const FileUpload = () => {
   };
 
   const handleFiles = (fileList: FileList) => {
+    // Check if wallet is connected before processing files
+    if (!wallet) {
+      onRequireWallet?.();
+      return;
+    }
+
     const validFiles: UploadedFile[] = [];
     const errors: string[] = [];
     
@@ -163,6 +175,12 @@ const FileUpload = () => {
   };
 
   const handleFormSubmit = (data: any) => {
+    // Check if wallet is connected before submitting form
+    if (!wallet) {
+      onRequireWallet?.();
+      return;
+    }
+
     console.log('Form data:', data);
     // Here you would typically send the data to your backend
     alert('Form submitted successfully!');

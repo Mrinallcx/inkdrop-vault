@@ -3,7 +3,11 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import WalletConnectedNav from './WalletConnectedNav';
 
-const Navbar = () => {
+interface NavbarProps {
+  onConnectWallet?: () => void;
+}
+
+const Navbar = ({ onConnectWallet }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
@@ -47,7 +51,7 @@ const Navbar = () => {
 
           {/* Desktop CTA Button */}
           <div className="hidden md:block">
-            <WalletConnectedNav />
+            <WalletConnectedNav onConnectClick={onConnectWallet} />
           </div>
 
           {/* Mobile menu button */}
@@ -86,9 +90,7 @@ const Navbar = () => {
               </a>
             ))}
             <div className="pt-2">
-              <button className="w-full bg-primary text-primary-foreground px-4 py-2 text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors">
-                Get Started
-              </button>
+              <WalletConnectedNav onConnectClick={onConnectWallet} />
             </div>
           </div>
         </div>

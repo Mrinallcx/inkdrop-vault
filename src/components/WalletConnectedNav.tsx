@@ -6,10 +6,25 @@ import { useWallet } from '@/contexts/WalletContext';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
-const WalletConnectedNav = () => {
+interface WalletConnectedNavProps {
+  onConnectClick?: () => void;
+}
+
+const WalletConnectedNav = ({ onConnectClick }: WalletConnectedNavProps) => {
   const { wallet, disconnect } = useWallet();
 
-  if (!wallet) return null;
+  // If no wallet connected, show Connect button
+  if (!wallet) {
+    return (
+      <Button onClick={onConnectClick} className="gap-2">
+        <Wallet className="h-4 w-4" />
+        <span className="hidden sm:inline">Connect Wallet</span>
+        <span className="sm:hidden">Connect</span>
+      </Button>
+    );
+  }
+
+  
 
   const copyAddress = () => {
     navigator.clipboard.writeText(wallet.address);
