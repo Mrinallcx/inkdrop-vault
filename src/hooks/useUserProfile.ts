@@ -43,11 +43,13 @@ export const useUserProfile = () => {
   const upsertUserProfile = async () => {
     if (!wallet) return null;
 
+    console.log('upsertUserProfile: Starting authentication for wallet:', wallet.address);
     setLoading(true);
     setError(null);
 
     try {
       // Use the wallet-auth edge function to create profile and session
+      console.log('upsertUserProfile: Calling wallet-auth function');
       const { data: authData, error } = await supabase.functions.invoke('wallet-auth', {
         body: {
           wallet_address: wallet.address,
@@ -56,9 +58,12 @@ export const useUserProfile = () => {
         }
       });
 
+      console.log('upsertUserProfile: wallet-auth response:', { authData, error });
+
       if (error) throw error;
 
       if (authData?.session) {
+        console.log('upsertUserProfile: Setting session with token');
         // Set the session in Supabase client
         const { error: sessionError } = await supabase.auth.setSession({
           access_token: authData.session.access_token,
@@ -69,8 +74,10 @@ export const useUserProfile = () => {
           console.error('Failed to set session:', sessionError);
           throw sessionError;
         }
+        console.log('upsertUserProfile: Session set successfully');
       }
 
+      console.log('upsertUserProfile: Profile data:', authData?.profile);
       setProfile(authData?.profile || null);
       return authData?.profile || null;
     } catch (error: any) {
@@ -159,9 +166,12 @@ export const useUserProfile = () => {
 
   // Auto-fetch or create profile when wallet connects
   useEffect(() => {
+    console.log('useUserProfile: Wallet state changed:', wallet);
     if (wallet) {
+      console.log('useUserProfile: Fetching profile for wallet:', wallet.address);
       fetchProfile();
     } else {
+      console.log('useUserProfile: No wallet, clearing profile');
       setProfile(null);
       setError(null);
     }

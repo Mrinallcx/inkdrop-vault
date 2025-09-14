@@ -148,8 +148,12 @@ export const useFileUpload = () => {
 
       // Create file upload record in database
       if (!profile?.id) {
+        console.error('uploadSingleFile: No profile ID available');
         throw new Error('User profile not found. Please connect your wallet first.');
       }
+
+      console.log('uploadSingleFile: Creating database record for file:', fileName);
+      console.log('uploadSingleFile: Profile ID:', profile.id);
 
       const { data: fileData, error: dbError } = await supabase
         .from('file_uploads')
@@ -172,6 +176,8 @@ export const useFileUpload = () => {
         })
         .select()
         .single();
+
+      console.log('uploadSingleFile: Database insert result:', { fileData, dbError });
 
       if (dbError) {
         // Clean up uploaded file if database insert fails
