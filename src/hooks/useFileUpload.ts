@@ -156,6 +156,14 @@ export const useFileUpload = () => {
 
       console.log('uploadSingleFile: Creating database record for file:', fileName);
       console.log('uploadSingleFile: Profile ID:', profile.id);
+      console.log('uploadSingleFile: Insert data:', {
+        uploader_id: profile.id,
+        filename: fileName,
+        original_filename: file.name,
+        file_type: file.type,
+        file_size: file.size,
+        storage_path: filePath
+      });
 
       const { data: fileData, error: dbError } = await supabase
         .from('file_uploads')
@@ -178,6 +186,8 @@ export const useFileUpload = () => {
         })
         .select()
         .single();
+      
+      console.log('uploadSingleFile: Database insert result:', { success: !!fileData, error: dbError });
 
       console.log('uploadSingleFile: Database insert result:', { fileData, dbError });
 
