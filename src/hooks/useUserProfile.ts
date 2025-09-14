@@ -47,29 +47,27 @@ export const useUserProfile = () => {
     setError(null);
 
     try {
-      // Set session context for RLS
-      await setSessionWalletAddress(wallet.address);
-
-      // Call the upsert function
-      const { data, error } = await supabase.rpc('upsert_user_profile', {
-        p_wallet_address: wallet.address,
-        p_wallet_type: wallet.type,
-        p_network: wallet.network
+      // Use the wallet-auth edge function to create profile and session
+      const { data: authData, error } = await supabase.functions.invoke('wallet-auth', {
+        body: {
+          wallet_address: wallet.address,
+          wallet_type: wallet.type,
+          network: wallet.network
+        }
       });
 
       if (error) throw error;
 
-      // Fetch the complete profile
-      const { data: profileData, error: fetchError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('wallet_address', wallet.address)
-        .single();
+      if (authData?.session) {
+        // Set the session in Supabase client
+        await supabase.auth.setSession({
+          access_token: authData.session.access_token,
+          refresh_token: '', // Not needed for our use case
+        });
+      }
 
-      if (fetchError) throw fetchError;
-
-      setProfile(profileData);
-      return profileData;
+      setProfile(authData?.profile || null);
+      return authData?.profile || null;
     } catch (error: any) {
       console.error('Error upserting user profile:', error);
       setError(error.message);
@@ -92,8 +90,6 @@ export const useUserProfile = () => {
     setError(null);
 
     try {
-      await setSessionWalletAddress(wallet.address);
-
       const { data, error } = await supabase
         .from('user_profiles')
         .update(updates)
@@ -131,8 +127,6 @@ export const useUserProfile = () => {
     setError(null);
 
     try {
-      await setSessionWalletAddress(wallet.address);
-
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')

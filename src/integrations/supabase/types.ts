@@ -451,6 +451,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_id_by_wallet: {
+        Args: { wallet_addr: string }
+        Returns: string
+      }
       upsert_user_profile: {
         Args: {
           p_network?: string
