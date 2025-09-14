@@ -36,6 +36,7 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
   } = useFileUpload();
   
   console.log('FileUpload component rendered, wallet:', wallet);
+  
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -107,47 +108,6 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
     }
     
     return validFiles;
-  };
-    const fileType = file.type.toLowerCase();
-    const fileSize = file.size;
-    
-    // Define file type categories and size limits
-    const isImage = fileType.startsWith('image/');
-    const isAudio = fileType.startsWith('audio/');
-    const isVideo = fileType.startsWith('video/');
-    
-    // Check if file type is supported
-    if (!isImage && !isAudio && !isVideo) {
-      return { isValid: false, error: 'Only image, audio, and video files are supported' };
-    }
-    
-    // Check file size limits
-    const maxSizes = {
-      image: 10 * 1024 * 1024, // 10MB
-      audio: 50 * 1024 * 1024, // 50MB
-      video: 1024 * 1024 * 1024, // 1GB
-    };
-    
-    let maxSize = 0;
-    let fileTypeText = '';
-    
-    if (isImage) {
-      maxSize = maxSizes.image;
-      fileTypeText = 'Image';
-    } else if (isAudio) {
-      maxSize = maxSizes.audio;
-      fileTypeText = 'Audio';
-    } else if (isVideo) {
-      maxSize = maxSizes.video;
-      fileTypeText = 'Video';
-    }
-    
-    if (fileSize > maxSize) {
-      const maxSizeText = formatFileSize(maxSize);
-      return { isValid: false, error: `${fileTypeText} files must be smaller than ${maxSizeText}` };
-    }
-    
-    return { isValid: true };
   };
 
   const getFileIcon = (file: File) => {
@@ -222,56 +182,6 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
     }
   };
 
-  const uploadToSupabase = async (uploadedFile: UploadedFile) => {
-    try {
-      // Determine bucket based on file type
-      let bucketName: 'nft-images' | 'nft-animations' | 'collection-assets' = 'nft-images';
-      
-      if (uploadedFile.file.type.startsWith('video/')) {
-        bucketName = 'nft-animations';
-      } else if (uploadedFile.file.type.startsWith('audio/')) {
-        bucketName = 'nft-animations';
-      }
-
-      // Simulate progress updates
-      const progressInterval = setInterval(() => {
-        setFiles(prev => prev.map(file => {
-          if (file.id === uploadedFile.id && file.progress < 90) {
-            return { ...file, progress: file.progress + Math.random() * 20 };
-          }
-          return file;
-        }));
-      }, 300);
-
-      // Upload to Supabase
-      const fileUploadData = await uploadFile(uploadedFile.file, bucketName);
-      
-      clearInterval(progressInterval);
-      
-      // Update file status
-      setFiles(prev => prev.map(file => {
-        if (file.id === uploadedFile.id) {
-          return {
-            ...file,
-            progress: 100,
-            status: fileUploadData ? 'completed' : 'error',
-            fileUploadData
-          };
-        }
-        return file;
-      }));
-
-    } catch (error) {
-      console.error('Upload error:', error);
-      setFiles(prev => prev.map(file => {
-        if (file.id === uploadedFile.id) {
-          return { ...file, status: 'error', progress: 0 };
-        }
-        return file;
-      }));
-    }
-  };
-
   const removeFile = (fileId: string) => {
     setFiles(prev => prev.filter(file => file.id !== fileId));
     // Hide form if no files left
@@ -299,14 +209,6 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
 
   // Check if we have any completed files to show the form button
   const hasCompletedFiles = files.some(file => file.status === 'completed');
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
 
   // Show form if requested and we have files
   if (showForm && files.length > 0) {
@@ -357,22 +259,22 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
               Drag and drop files here, or click to browse
             </p>
             <p className="text-sm text-muted-foreground">
-              Images (up to 10MB) • Audio (up to 50MB) • Video (up to 1GB)
+              Images (up to 25MB) • Audio (up to 100MB) • Video (up to 500MB)
             </p>
           </div>
         </div>
       </div>
 
-          {/* Upload Progress Component */}
-          {uploadQueue.length > 0 && (
-            <FileUploadProgress 
-              uploads={uploadQueue}
-              onRemove={removeFromQueue}
-              onClear={clearUploadQueue}
-            />
-          )}
+      {/* Upload Progress Component */}
+      {uploadQueue.length > 0 && (
+        <FileUploadProgress 
+          uploads={uploadQueue}
+          onRemove={removeFromQueue}
+          onClear={clearUploadQueue}
+        />
+      )}
 
-          {/* File List */}
+      {/* File List */}
       {files.length > 0 && (
         <div className="space-y-3">
           <h4 className="font-medium text-foreground">Uploaded Files ({files.length})</h4>
