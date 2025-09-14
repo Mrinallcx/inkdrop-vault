@@ -404,6 +404,7 @@ export type Database = {
           total_nfts_owned: number | null
           twitter_handle: string | null
           updated_at: string
+          user_id: string | null
           wallet_address: string
           wallet_type: string
           website_url: string | null
@@ -422,6 +423,7 @@ export type Database = {
           total_nfts_owned?: number | null
           twitter_handle?: string | null
           updated_at?: string
+          user_id?: string | null
           wallet_address: string
           wallet_type: string
           website_url?: string | null
@@ -440,6 +442,7 @@ export type Database = {
           total_nfts_owned?: number | null
           twitter_handle?: string | null
           updated_at?: string
+          user_id?: string | null
           wallet_address?: string
           wallet_type?: string
           website_url?: string | null
@@ -451,6 +454,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_current_user_profile_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_id_by_wallet: {
         Args: { wallet_addr: string }
         Returns: string

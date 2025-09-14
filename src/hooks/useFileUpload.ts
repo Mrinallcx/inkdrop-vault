@@ -67,6 +67,8 @@ export const useFileUpload = () => {
       });
       throw new Error('User profile not found. Please connect your wallet first.');
     }
+
+    console.log('Starting file upload for profile:', profile.id);
     if (!profile) {
       toast({
         title: "Authentication Required",

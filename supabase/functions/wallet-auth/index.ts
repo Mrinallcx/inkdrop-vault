@@ -49,7 +49,7 @@ serve(async (req) => {
       );
     }
 
-    // Get the full profile
+    // Get the full profile and link it to the auth user
     const { data: profile, error: fetchError } = await supabase
       .from('user_profiles')
       .select('*')
@@ -96,6 +96,16 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
+    }
+
+    // Link the profile to the auth user
+    const { error: linkError } = await supabase
+      .from('user_profiles')
+      .update({ user_id: authUser.id })
+      .eq('id', profile.id);
+
+    if (linkError) {
+      console.error('Profile link error:', linkError);
     }
 
     // Generate access token and create session
