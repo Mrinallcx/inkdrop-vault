@@ -1,6 +1,7 @@
 import { Upload, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import WalletConnectedNav from './WalletConnectedNav';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -46,9 +47,7 @@ const Navbar = () => {
 
           {/* Desktop CTA Button */}
           <div className="hidden md:block">
-            <button className="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors">
-              Get Started
-            </button>
+            <WalletConnectedNav />
           </div>
 
           {/* Mobile menu button */}
