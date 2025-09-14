@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
 import { toast } from '@/hooks/use-toast';
+import { validateFile, performSecurityChecks, getBucketForFile, ValidationResult } from '@/utils/fileValidation';
 
 export interface FileUploadData {
   id: string;
@@ -21,14 +22,42 @@ export interface FileUploadData {
   updated_at: string;
 }
 
+export interface UploadProgress {
+  fileId: string;
+  fileName: string;
+  progress: number;
+  status: 'queued' | 'uploading' | 'processing' | 'completed' | 'failed';
+  error?: string;
+  warnings?: string[];
+}
+
 export const useFileUpload = () => {
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadQueue, setUploadQueue] = useState<UploadProgress[]>([]);
   const { profile } = useUserProfile();
 
-  const uploadFile = async (
+  const validateAndPrepareFile = (file: File): ValidationResult & { warnings?: string[] } => {
+    // Basic validation
+    const validation = validateFile(file);
+    if (!validation.isValid) {
+      return validation;
+    }
+
+    // Security checks
+    const securityCheck = performSecurityChecks(file);
+    if (!securityCheck.isValid) {
+      return securityCheck;
+    }
+
+    return {
+      isValid: true,
+      warnings: validation.warnings
+    };
+  };
+
+  const uploadSingleFile = async (
     file: File,
-    bucketName: 'nft-images' | 'nft-animations' | 'collection-assets' | 'user-avatars'
+    bucketName?: 'nft-images' | 'nft-animations' | 'collection-assets' | 'user-avatars'
   ): Promise<FileUploadData | null> => {
     if (!profile) {
       toast({
@@ -39,18 +68,57 @@ export const useFileUpload = () => {
       return null;
     }
 
-    setUploading(true);
-    setUploadProgress(0);
+    // Validate file
+    const validation = validateAndPrepareFile(file);
+    if (!validation.isValid) {
+      toast({
+        title: "Invalid File",
+        description: validation.error,
+        variant: "destructive",
+      });
+      return null;
+    }
+
+    // Show warnings if any
+    if (validation.warnings && validation.warnings.length > 0) {
+      validation.warnings.forEach(warning => {
+        toast({
+          title: "Upload Warning",
+          description: warning,
+        });
+      });
+    }
+
+    const bucket = bucketName || getBucketForFile(file);
+    const fileId = crypto.randomUUID();
+    
+    // Add to upload queue
+    const uploadProgress: UploadProgress = {
+      fileId,
+      fileName: file.name,
+      progress: 0,
+      status: 'queued',
+      warnings: validation.warnings
+    };
+
+    setUploadQueue(prev => [...prev, uploadProgress]);
 
     try {
+      // Update status to uploading
+      setUploadQueue(prev => prev.map(item => 
+        item.fileId === fileId 
+          ? { ...item, status: 'uploading' as const }
+          : item
+      ));
+
       // Generate unique filename
       const fileExt = file.name.split('.').pop();
       const fileName = `${profile.id}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${bucketName}/${fileName}`;
+      const filePath = `${bucket}/${fileName}`;
 
-      // Upload file to Supabase Storage
+      // Upload file to Supabase Storage with progress tracking
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from(bucketName)
+        .from(bucket)
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
@@ -58,12 +126,17 @@ export const useFileUpload = () => {
 
       if (uploadError) throw uploadError;
 
+      // Update progress
+      setUploadQueue(prev => prev.map(item => 
+        item.fileId === fileId 
+          ? { ...item, progress: 70 }
+          : item
+      ));
+
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from(bucketName)
+        .from(bucket)
         .getPublicUrl(filePath);
-
-      setUploadProgress(50);
 
       // Create file upload record in database
       const { data: fileData, error: dbError } = await supabase
@@ -76,10 +149,13 @@ export const useFileUpload = () => {
           file_size: file.size,
           storage_path: filePath,
           public_url: publicUrl,
-          processing_status: 'completed',
+          processing_status: 'pending',
           metadata: {
-            bucket: bucketName,
+            bucket,
             upload_date: new Date().toISOString(),
+            validation_warnings: validation.warnings,
+            category: getBucketForFile(file) === 'nft-images' ? 'image' : 
+                     getBucketForFile(file) === 'nft-animations' ? 'media' : 'asset'
           },
         })
         .select()
@@ -87,7 +163,35 @@ export const useFileUpload = () => {
 
       if (dbError) throw dbError;
 
-      setUploadProgress(100);
+      // Update progress
+      setUploadQueue(prev => prev.map(item => 
+        item.fileId === fileId 
+          ? { ...item, progress: 90, status: 'processing' as const }
+          : item
+      ));
+
+      // Start background processing
+      const { error: processError } = await supabase.functions.invoke('process-file', {
+        body: {
+          fileId: fileData.id,
+          originalPath: filePath,
+          fileType: file.type,
+          optimize: true,
+          generateThumbnail: true,
+        }
+      });
+
+      if (processError) {
+        console.warn('Background processing failed to start:', processError);
+        // Continue anyway, file is uploaded successfully
+      }
+
+      // Complete upload
+      setUploadQueue(prev => prev.map(item => 
+        item.fileId === fileId 
+          ? { ...item, progress: 100, status: 'completed' as const }
+          : item
+      ));
 
       toast({
         title: "Upload Successful",
@@ -95,18 +199,59 @@ export const useFileUpload = () => {
       });
 
       return fileData;
+
     } catch (error: any) {
       console.error('File upload error:', error);
+      
+      setUploadQueue(prev => prev.map(item => 
+        item.fileId === fileId 
+          ? { ...item, status: 'failed' as const, error: error.message }
+          : item
+      ));
+
       toast({
         title: "Upload Failed",
         description: error.message || "Failed to upload file",
         variant: "destructive",
       });
       return null;
+    }
+  };
+
+  const uploadMultipleFiles = async (
+    files: FileList | File[],
+    bucketName?: 'nft-images' | 'nft-animations' | 'collection-assets' | 'user-avatars'
+  ): Promise<FileUploadData[]> => {
+    setUploading(true);
+    const fileArray = Array.from(files);
+    const results: FileUploadData[] = [];
+
+    try {
+      for (const file of fileArray) {
+        const result = await uploadSingleFile(file, bucketName);
+        if (result) {
+          results.push(result);
+        }
+      }
+      return results;
     } finally {
       setUploading(false);
-      setUploadProgress(0);
     }
+  };
+
+  const clearUploadQueue = () => {
+    setUploadQueue([]);
+  };
+
+  const removeFromQueue = (fileId: string) => {
+    setUploadQueue(prev => prev.filter(item => item.fileId !== fileId));
+  };
+
+  const retryUpload = async (fileId: string, file: File) => {
+    // Remove failed upload from queue
+    setUploadQueue(prev => prev.filter(item => item.fileId !== fileId));
+    // Retry upload
+    return await uploadSingleFile(file);
   };
 
   const deleteFile = async (fileId: string, storagePath: string) => {
@@ -170,9 +315,13 @@ export const useFileUpload = () => {
 
   return {
     uploading,
-    uploadProgress,
-    uploadFile,
+    uploadQueue,
+    uploadFile: uploadSingleFile,
+    uploadMultipleFiles,
     deleteFile,
     getUserFiles,
+    clearUploadQueue,
+    removeFromQueue,
+    retryUpload,
   };
 };

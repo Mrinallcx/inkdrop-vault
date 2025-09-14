@@ -1,15 +1,23 @@
 import React, { useState, useCallback } from 'react';
-import { Upload, File, X, Image, Music, Video } from 'lucide-react';
+import { Upload, File, X, Image, Music, Video, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWallet } from '@/contexts/WalletContext';
 import { useFileUpload } from '@/hooks/useFileUpload';
+import { validateFile, performSecurityChecks, formatFileSize } from '@/utils/fileValidation';
+import { toast } from '@/hooks/use-toast';
 import FileDetailsForm from './FileDetailsForm';
+import FileUploadProgress from './FileUploadProgress';
 
 interface UploadedFile {
   id: string;
   file: File;
+  validation: {
+    isValid: boolean;
+    error?: string;
+    warnings?: string[];
+  };
   progress: number;
-  status: 'uploading' | 'completed' | 'error';
+  status: 'pending' | 'uploading' | 'completed' | 'error';
   fileUploadData?: any;
 }
 
@@ -19,7 +27,13 @@ interface FileUploadProps {
 
 const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
   const { wallet } = useWallet();
-  const { uploadFile, uploading } = useFileUpload();
+  const { 
+    uploading, 
+    uploadQueue, 
+    uploadMultipleFiles, 
+    clearUploadQueue, 
+    removeFromQueue 
+  } = useFileUpload();
   
   console.log('FileUpload component rendered, wallet:', wallet);
   const [dragActive, setDragActive] = useState(false);
@@ -53,7 +67,47 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
     }
   };
 
-  const validateFile = (file: File): { isValid: boolean; error?: string } => {
+  const validateFileList = (fileList: FileList): UploadedFile[] => {
+    const validFiles: UploadedFile[] = [];
+    const rejectedFiles: string[] = [];
+    
+    Array.from(fileList).forEach(file => {
+      // Basic validation
+      const validation = validateFile(file);
+      let finalValidation = validation;
+      
+      // Security checks if basic validation passes
+      if (validation.isValid) {
+        const securityCheck = performSecurityChecks(file);
+        if (!securityCheck.isValid) {
+          finalValidation = securityCheck;
+        }
+      }
+      
+      if (finalValidation.isValid) {
+        validFiles.push({
+          id: crypto.randomUUID(),
+          file,
+          validation: finalValidation,
+          progress: 0,
+          status: 'pending'
+        });
+      } else {
+        rejectedFiles.push(`${file.name}: ${finalValidation.error}`);
+      }
+    });
+    
+    // Show rejected files
+    if (rejectedFiles.length > 0) {
+      toast({
+        title: `${rejectedFiles.length} file${rejectedFiles.length > 1 ? 's' : ''} rejected`,
+        description: rejectedFiles.slice(0, 3).join('\n') + (rejectedFiles.length > 3 ? `\n...and ${rejectedFiles.length - 3} more` : ''),
+        variant: "destructive",
+      });
+    }
+    
+    return validFiles;
+  };
     const fileType = file.type.toLowerCase();
     const fileSize = file.size;
     
@@ -110,10 +164,8 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
     return <File className="w-5 h-5 text-muted-foreground" />;
   };
 
-  const handleFiles = (fileList: FileList) => {
-    // Debug logging
+  const handleFiles = async (fileList: FileList) => {
     console.log('FileUpload - handleFiles called, wallet:', wallet);
-    console.log('FileUpload - wallet connected?', !!wallet);
     
     // Check if wallet is connected before processing files
     if (!wallet) {
@@ -122,37 +174,51 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
       return;
     }
 
-    const validFiles: UploadedFile[] = [];
-    const errors: string[] = [];
+    const validatedFiles = validateFileList(fileList);
     
-    Array.from(fileList).forEach(file => {
-      const validation = validateFile(file);
-      
-      if (validation.isValid) {
-        validFiles.push({
-          id: Math.random().toString(36).substr(2, 9),
-          file,
-          progress: 0,
-          status: 'uploading'
+    if (validatedFiles.length === 0) {
+      return;
+    }
+
+    // Show warnings for valid files
+    validatedFiles.forEach(validatedFile => {
+      if (validatedFile.validation.warnings && validatedFile.validation.warnings.length > 0) {
+        validatedFile.validation.warnings.forEach(warning => {
+          toast({
+            title: "Upload Warning",
+            description: `${validatedFile.file.name}: ${warning}`,
+          });
         });
-      } else {
-        errors.push(`${file.name}: ${validation.error}`);
       }
     });
-    
-    // Show errors if any
-    if (errors.length > 0) {
-      alert(`Some files were rejected:\n${errors.join('\n')}`);
-    }
-    
-    // Add valid files and start upload
-    if (validFiles.length > 0) {
-      setFiles(prev => [...prev, ...validFiles]);
+
+    // Add valid files to display
+    setFiles(prev => [...prev, ...validatedFiles]);
+
+    try {
+      // Start upload process
+      const filesToUpload = validatedFiles.map(vf => vf.file);
+      await uploadMultipleFiles(filesToUpload);
       
-      // Start actual upload to Supabase
-      validFiles.forEach(uploadedFile => {
-        uploadToSupabase(uploadedFile);
-      });
+      // Update files status to completed
+      setFiles(prev => prev.map(file => {
+        const matchingValidated = validatedFiles.find(vf => vf.id === file.id);
+        if (matchingValidated) {
+          return { ...file, status: 'completed' as const, progress: 100 };
+        }
+        return file;
+      }));
+
+    } catch (error) {
+      console.error('Upload process failed:', error);
+      // Update failed files
+      setFiles(prev => prev.map(file => {
+        const matchingValidated = validatedFiles.find(vf => vf.id === file.id);
+        if (matchingValidated) {
+          return { ...file, status: 'error' as const };
+        }
+        return file;
+      }));
     }
   };
 
@@ -297,7 +363,16 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
         </div>
       </div>
 
-      {/* File List */}
+          {/* Upload Progress Component */}
+          {uploadQueue.length > 0 && (
+            <FileUploadProgress 
+              uploads={uploadQueue}
+              onRemove={removeFromQueue}
+              onClear={clearUploadQueue}
+            />
+          )}
+
+          {/* File List */}
       {files.length > 0 && (
         <div className="space-y-3">
           <h4 className="font-medium text-foreground">Uploaded Files ({files.length})</h4>
@@ -328,6 +403,13 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
                       {formatFileSize(uploadedFile.file.size)}
                     </p>
                     
+                    {uploadedFile.status === 'pending' && (
+                      <>
+                        <span className="text-muted-foreground">•</span>
+                        <p className="text-sm text-muted-foreground">Ready to upload</p>
+                      </>
+                    )}
+                    
                     {uploadedFile.status === 'uploading' && (
                       <>
                         <span className="text-muted-foreground">•</span>
@@ -343,7 +425,26 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
                         <p className="text-sm text-primary font-medium">Completed</p>
                       </>
                     )}
+
+                    {uploadedFile.status === 'error' && (
+                      <>
+                        <span className="text-muted-foreground">•</span>
+                        <p className="text-sm text-destructive font-medium">Failed</p>
+                      </>
+                    )}
                   </div>
+
+                  {/* Validation warnings */}
+                  {uploadedFile.validation.warnings && uploadedFile.validation.warnings.length > 0 && (
+                    <div className="mt-2 flex items-start gap-1">
+                      <AlertTriangle className="w-3 h-3 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <div className="space-y-1">
+                        {uploadedFile.validation.warnings.map((warning, index) => (
+                          <p key={index} className="text-xs text-amber-600">{warning}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   
                   {uploadedFile.status === 'uploading' && (
                     <div className="mt-2 h-1 bg-muted rounded-full overflow-hidden">
