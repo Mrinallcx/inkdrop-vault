@@ -62,6 +62,14 @@ export const useFileUpload = () => {
     if (!profile) {
       toast({
         title: "Authentication Required",
+        description: "Please connect your wallet before uploading files",
+        variant: "destructive",
+      });
+      throw new Error('User profile not found. Please connect your wallet first.');
+    }
+    if (!profile) {
+      toast({
+        title: "Authentication Required",
         description: "Please connect your wallet to upload files",
         variant: "destructive",
       });
@@ -139,6 +147,10 @@ export const useFileUpload = () => {
         .getPublicUrl(filePath);
 
       // Create file upload record in database
+      if (!profile?.id) {
+        throw new Error('User profile not found. Please connect your wallet first.');
+      }
+
       const { data: fileData, error: dbError } = await supabase
         .from('file_uploads')
         .insert({
@@ -161,7 +173,15 @@ export const useFileUpload = () => {
         .select()
         .single();
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        // Clean up uploaded file if database insert fails
+        await supabase.storage
+          .from(bucket)
+          .remove([filePath]);
+        
+        console.error('Database error during file upload:', dbError);
+        throw new Error(`Upload failed: ${dbError.message}. Please ensure you are connected with your wallet.`);
+      }
 
       // Update progress
       setUploadQueue(prev => prev.map(item => 

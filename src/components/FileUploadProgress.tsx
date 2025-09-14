@@ -127,7 +127,14 @@ const FileUploadProgress = ({ uploads, onRemove, onRetry, onClear }: FileUploadP
 
               {/* Error Message */}
               {upload.status === 'failed' && upload.error && (
-                <p className="text-xs text-destructive">{upload.error}</p>
+                <div className="space-y-1">
+                  <p className="text-xs text-destructive">{upload.error}</p>
+                  {upload.error.includes('wallet') && (
+                    <p className="text-xs text-muted-foreground">
+                      💡 Make sure your wallet is connected before uploading files
+                    </p>
+                  )}
+                </div>
               )}
 
               {/* Warnings */}
