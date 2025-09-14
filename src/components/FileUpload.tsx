@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Upload, File, X, Image, Music, Video } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWallet } from '@/contexts/WalletContext';
+import { useFileUpload } from '@/hooks/useFileUpload';
 import FileDetailsForm from './FileDetailsForm';
 
 interface UploadedFile {
@@ -9,6 +10,7 @@ interface UploadedFile {
   file: File;
   progress: number;
   status: 'uploading' | 'completed' | 'error';
+  fileUploadData?: any;
 }
 
 interface FileUploadProps {
@@ -17,6 +19,7 @@ interface FileUploadProps {
 
 const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
   const { wallet } = useWallet();
+  const { uploadFile, uploading } = useFileUpload();
   
   console.log('FileUpload component rendered, wallet:', wallet);
   const [dragActive, setDragActive] = useState(false);
@@ -142,35 +145,65 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
       alert(`Some files were rejected:\n${errors.join('\n')}`);
     }
     
-    // Add valid files
+    // Add valid files and start upload
     if (validFiles.length > 0) {
       setFiles(prev => [...prev, ...validFiles]);
       
-      // Simulate upload progress
+      // Start actual upload to Supabase
       validFiles.forEach(uploadedFile => {
-        simulateUpload(uploadedFile.id);
+        uploadToSupabase(uploadedFile);
       });
     }
   };
 
-  const simulateUpload = (fileId: string) => {
-    const interval = setInterval(() => {
+  const uploadToSupabase = async (uploadedFile: UploadedFile) => {
+    try {
+      // Determine bucket based on file type
+      let bucketName: 'nft-images' | 'nft-animations' | 'collection-assets' = 'nft-images';
+      
+      if (uploadedFile.file.type.startsWith('video/')) {
+        bucketName = 'nft-animations';
+      } else if (uploadedFile.file.type.startsWith('audio/')) {
+        bucketName = 'nft-animations';
+      }
+
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setFiles(prev => prev.map(file => {
+          if (file.id === uploadedFile.id && file.progress < 90) {
+            return { ...file, progress: file.progress + Math.random() * 20 };
+          }
+          return file;
+        }));
+      }, 300);
+
+      // Upload to Supabase
+      const fileUploadData = await uploadFile(uploadedFile.file, bucketName);
+      
+      clearInterval(progressInterval);
+      
+      // Update file status
       setFiles(prev => prev.map(file => {
-        if (file.id === fileId) {
-          const newProgress = Math.min(file.progress + Math.random() * 20, 100);
-          const status = newProgress === 100 ? 'completed' : 'uploading';
-          return { ...file, progress: newProgress, status };
+        if (file.id === uploadedFile.id) {
+          return {
+            ...file,
+            progress: 100,
+            status: fileUploadData ? 'completed' : 'error',
+            fileUploadData
+          };
         }
         return file;
       }));
-    }, 200);
 
-    setTimeout(() => {
-      clearInterval(interval);
-      setFiles(prev => prev.map(file => 
-        file.id === fileId ? { ...file, progress: 100, status: 'completed' } : file
-      ));
-    }, 2000);
+    } catch (error) {
+      console.error('Upload error:', error);
+      setFiles(prev => prev.map(file => {
+        if (file.id === uploadedFile.id) {
+          return { ...file, status: 'error', progress: 0 };
+        }
+        return file;
+      }));
+    }
   };
 
   const removeFile = (fileId: string) => {

@@ -14,13 +14,451 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      file_uploads: {
+        Row: {
+          compression_ratio: number | null
+          created_at: string
+          file_size: number
+          file_type: string
+          filename: string
+          id: string
+          is_compressed: boolean | null
+          metadata: Json | null
+          original_filename: string
+          processing_status: string | null
+          public_url: string | null
+          storage_path: string
+          thumbnail_url: string | null
+          updated_at: string
+          uploader_id: string
+        }
+        Insert: {
+          compression_ratio?: number | null
+          created_at?: string
+          file_size: number
+          file_type: string
+          filename: string
+          id?: string
+          is_compressed?: boolean | null
+          metadata?: Json | null
+          original_filename: string
+          processing_status?: string | null
+          public_url?: string | null
+          storage_path: string
+          thumbnail_url?: string | null
+          updated_at?: string
+          uploader_id: string
+        }
+        Update: {
+          compression_ratio?: number | null
+          created_at?: string
+          file_size?: number
+          file_type?: string
+          filename?: string
+          id?: string
+          is_compressed?: boolean | null
+          metadata?: Json | null
+          original_filename?: string
+          processing_status?: string | null
+          public_url?: string | null
+          storage_path?: string
+          thumbnail_url?: string | null
+          updated_at?: string
+          uploader_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_uploads_uploader_id_fkey"
+            columns: ["uploader_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      minting_transactions: {
+        Row: {
+          block_number: number | null
+          blockchain: string
+          confirmation_count: number | null
+          created_at: string
+          error_message: string | null
+          gas_fee: number | null
+          gas_limit: number | null
+          gas_price: number | null
+          id: string
+          network: string
+          nft_token_id: string
+          retry_count: number | null
+          status: string | null
+          transaction_hash: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          block_number?: number | null
+          blockchain: string
+          confirmation_count?: number | null
+          created_at?: string
+          error_message?: string | null
+          gas_fee?: number | null
+          gas_limit?: number | null
+          gas_price?: number | null
+          id?: string
+          network: string
+          nft_token_id: string
+          retry_count?: number | null
+          status?: string | null
+          transaction_hash?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          block_number?: number | null
+          blockchain?: string
+          confirmation_count?: number | null
+          created_at?: string
+          error_message?: string | null
+          gas_fee?: number | null
+          gas_limit?: number | null
+          gas_price?: number | null
+          id?: string
+          network?: string
+          nft_token_id?: string
+          retry_count?: number | null
+          status?: string | null
+          transaction_hash?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "minting_transactions_nft_token_id_fkey"
+            columns: ["nft_token_id"]
+            isOneToOne: false
+            referencedRelation: "nft_tokens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "minting_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nft_collections: {
+        Row: {
+          banner_image_url: string | null
+          blockchain: string
+          contract_address: string | null
+          cover_image_url: string | null
+          created_at: string
+          creator_id: string
+          description: string | null
+          discord_url: string | null
+          floor_price: number | null
+          id: string
+          is_featured: boolean | null
+          is_verified: boolean | null
+          name: string
+          symbol: string | null
+          total_supply: number | null
+          twitter_url: string | null
+          updated_at: string
+          volume_traded: number | null
+          website_url: string | null
+        }
+        Insert: {
+          banner_image_url?: string | null
+          blockchain?: string
+          contract_address?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          discord_url?: string | null
+          floor_price?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_verified?: boolean | null
+          name: string
+          symbol?: string | null
+          total_supply?: number | null
+          twitter_url?: string | null
+          updated_at?: string
+          volume_traded?: number | null
+          website_url?: string | null
+        }
+        Update: {
+          banner_image_url?: string | null
+          blockchain?: string
+          contract_address?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          discord_url?: string | null
+          floor_price?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_verified?: boolean | null
+          name?: string
+          symbol?: string | null
+          total_supply?: number | null
+          twitter_url?: string | null
+          updated_at?: string
+          volume_traded?: number | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nft_collections_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nft_tokens: {
+        Row: {
+          animation_file_id: string | null
+          attributes: Json | null
+          blockchain: string
+          collection_id: string | null
+          contract_address: string | null
+          created_at: string
+          creator_id: string
+          current_price: number | null
+          description: string | null
+          external_url: string | null
+          id: string
+          image_file_id: string | null
+          is_listed: boolean | null
+          is_minted: boolean | null
+          last_sale_price: number | null
+          levels: Json | null
+          like_count: number | null
+          mint_price: number | null
+          name: string
+          owner_id: string
+          properties: Json | null
+          royalty_percentage: number | null
+          royalty_recipient: string | null
+          stats: Json | null
+          token_id: string | null
+          token_standard: string | null
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          animation_file_id?: string | null
+          attributes?: Json | null
+          blockchain?: string
+          collection_id?: string | null
+          contract_address?: string | null
+          created_at?: string
+          creator_id: string
+          current_price?: number | null
+          description?: string | null
+          external_url?: string | null
+          id?: string
+          image_file_id?: string | null
+          is_listed?: boolean | null
+          is_minted?: boolean | null
+          last_sale_price?: number | null
+          levels?: Json | null
+          like_count?: number | null
+          mint_price?: number | null
+          name: string
+          owner_id: string
+          properties?: Json | null
+          royalty_percentage?: number | null
+          royalty_recipient?: string | null
+          stats?: Json | null
+          token_id?: string | null
+          token_standard?: string | null
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          animation_file_id?: string | null
+          attributes?: Json | null
+          blockchain?: string
+          collection_id?: string | null
+          contract_address?: string | null
+          created_at?: string
+          creator_id?: string
+          current_price?: number | null
+          description?: string | null
+          external_url?: string | null
+          id?: string
+          image_file_id?: string | null
+          is_listed?: boolean | null
+          is_minted?: boolean | null
+          last_sale_price?: number | null
+          levels?: Json | null
+          like_count?: number | null
+          mint_price?: number | null
+          name?: string
+          owner_id?: string
+          properties?: Json | null
+          royalty_percentage?: number | null
+          royalty_recipient?: string | null
+          stats?: Json | null
+          token_id?: string | null
+          token_standard?: string | null
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nft_tokens_animation_file_id_fkey"
+            columns: ["animation_file_id"]
+            isOneToOne: false
+            referencedRelation: "file_uploads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nft_tokens_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "nft_collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nft_tokens_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nft_tokens_image_file_id_fkey"
+            columns: ["image_file_id"]
+            isOneToOne: false
+            referencedRelation: "file_uploads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nft_tokens_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_activity: {
+        Row: {
+          activity_type: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activity_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          is_verified: boolean | null
+          network: string | null
+          total_collections: number | null
+          total_nfts_created: number | null
+          total_nfts_owned: number | null
+          twitter_handle: string | null
+          updated_at: string
+          wallet_address: string
+          wallet_type: string
+          website_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          is_verified?: boolean | null
+          network?: string | null
+          total_collections?: number | null
+          total_nfts_created?: number | null
+          total_nfts_owned?: number | null
+          twitter_handle?: string | null
+          updated_at?: string
+          wallet_address: string
+          wallet_type: string
+          website_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          is_verified?: boolean | null
+          network?: string | null
+          total_collections?: number | null
+          total_nfts_created?: number | null
+          total_nfts_owned?: number | null
+          twitter_handle?: string | null
+          updated_at?: string
+          wallet_address?: string
+          wallet_type?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      upsert_user_profile: {
+        Args: {
+          p_network?: string
+          p_wallet_address: string
+          p_wallet_type: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
