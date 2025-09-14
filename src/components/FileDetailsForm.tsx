@@ -114,12 +114,18 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
     return {
       name: formData.assetTitle,
       description: formData.shortDescription,
+      external_url: formData.externalLink,
+      animation_url: formData.externalLink2,
       attributes: [
         { trait_type: "Creator", value: formData.creatorName },
+        { trait_type: "Organization", value: formData.organizationName || "N/A" },
+        { trait_type: "Creation Date", value: formData.creationDate ? format(formData.creationDate, "PPP") : "N/A" },
         { trait_type: "Chain", value: formData.primaryChain },
-        { trait_type: "MIME Type", value: formData.mimeType },
-        { trait_type: "File Size", value: formData.fileSize?.toString() },
-      ]
+        { trait_type: "MIME Type", value: formData.mimeType || "N/A" },
+        { trait_type: "File Size", value: formData.fileSize ? `${formData.fileSize} bytes` : "N/A" },
+        { trait_type: "Storage Path", value: formData.storagePath || "N/A" },
+        { trait_type: "Categories", value: formData.categoryTags?.join(", ") || "N/A" },
+      ].filter(attr => attr.value && attr.value !== "N/A")
     };
   };
 
