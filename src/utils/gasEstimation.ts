@@ -165,24 +165,15 @@ export class GasEstimationManager {
       const isEIP1559 = feeData.maxFeePerGas && feeData.maxPriorityFeePerGas;
 
       if (isEIP1559) {
-        const baseFee = feeData.maxFeePerGas! - feeData.maxPriorityFeePerGas!;
+        const maxFeePerGas = feeData.maxFeePerGas!;
+        const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas!;
         
         return {
           slow: this.calculateGasCosts(
             standardGasLimit,
             {
-              maxFeePerGas: baseFee + feeData.maxPriorityFeePerGas! / BigInt(2),
-              maxPriorityFeePerGas: feeData.maxPriorityFeePerGas! / BigInt(2),
-            },
-            chainId
-          ),
-        
-        return {
-          slow: this.calculateGasCosts(
-            standardGasLimit,
-            {
-              maxFeePerGas: baseFee + feeData.maxPriorityFeePerGas! / BigInt(2),
-              maxPriorityFeePerGas: feeData.maxPriorityFeePerGas! / BigInt(2),
+              maxFeePerGas: maxFeePerGas - maxPriorityFeePerGas / BigInt(2),
+              maxPriorityFeePerGas: maxPriorityFeePerGas / BigInt(2),
             },
             chainId
           ),
@@ -190,8 +181,8 @@ export class GasEstimationManager {
           fast: this.calculateGasCosts(
             standardGasLimit,
             {
-              maxFeePerGas: (feeData.maxFeePerGas! * BigInt(12)) / BigInt(10),
-              maxPriorityFeePerGas: (feeData.maxPriorityFeePerGas! * BigInt(15)) / BigInt(10),
+              maxFeePerGas: (maxFeePerGas * BigInt(12)) / BigInt(10),
+              maxPriorityFeePerGas: (maxPriorityFeePerGas * BigInt(15)) / BigInt(10),
             },
             chainId
           ),
