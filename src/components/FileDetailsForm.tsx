@@ -139,8 +139,7 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
               <Upload className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">NFT Minting Platform</h2>
-              <p className="text-muted-foreground">Create and deploy your digital assets to blockchain</p>
+              <h2 className="text-2xl font-bold">Tokenize your asset</h2>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -162,13 +161,6 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
           </div>
         </div>
 
-        {/* Gas Estimate Alert */}
-        <Alert>
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Estimated Gas Cost:</strong> {estimatedGas} • Network fees vary based on congestion
-          </AlertDescription>
-        </Alert>
 
         {previewMode ? (
           /* Preview Mode */
