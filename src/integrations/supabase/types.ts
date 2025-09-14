@@ -351,6 +351,75 @@ export type Database = {
           },
         ]
       }
+      transaction_history: {
+        Row: {
+          block_number: number | null
+          chain_id: string
+          confirmations: number | null
+          contract_address: string | null
+          created_at: string
+          error_message: string | null
+          from_address: string
+          gas_limit: string
+          gas_price: string | null
+          gas_used: string | null
+          hash: string
+          id: string
+          method_name: string | null
+          method_params: Json | null
+          status: string
+          to_address: string
+          transaction_type: string
+          updated_at: string
+          user_address: string
+          value: string
+        }
+        Insert: {
+          block_number?: number | null
+          chain_id: string
+          confirmations?: number | null
+          contract_address?: string | null
+          created_at?: string
+          error_message?: string | null
+          from_address: string
+          gas_limit: string
+          gas_price?: string | null
+          gas_used?: string | null
+          hash: string
+          id?: string
+          method_name?: string | null
+          method_params?: Json | null
+          status?: string
+          to_address: string
+          transaction_type?: string
+          updated_at?: string
+          user_address: string
+          value?: string
+        }
+        Update: {
+          block_number?: number | null
+          chain_id?: string
+          confirmations?: number | null
+          contract_address?: string | null
+          created_at?: string
+          error_message?: string | null
+          from_address?: string
+          gas_limit?: string
+          gas_price?: string | null
+          gas_used?: string | null
+          hash?: string
+          id?: string
+          method_name?: string | null
+          method_params?: Json | null
+          status?: string
+          to_address?: string
+          transaction_type?: string
+          updated_at?: string
+          user_address?: string
+          value?: string
+        }
+        Relationships: []
+      }
       user_activity: {
         Row: {
           activity_type: string

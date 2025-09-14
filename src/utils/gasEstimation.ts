@@ -176,12 +176,22 @@ export class GasEstimationManager {
             },
             chainId
           ),
+        
+        return {
+          slow: this.calculateGasCosts(
+            standardGasLimit,
+            {
+              maxFeePerGas: baseFee + feeData.maxPriorityFeePerGas! / BigInt(2),
+              maxPriorityFeePerGas: feeData.maxPriorityFeePerGas! / BigInt(2),
+            },
+            chainId
+          ),
           standard: this.calculateGasCosts(standardGasLimit, feeData, chainId),
           fast: this.calculateGasCosts(
             standardGasLimit,
             {
-              maxFeePerGas: feeData.maxFeePerGas! * BigInt(12) / BigInt(10),
-              maxPriorityFeePerGas: feeData.maxPriorityFeePerGas! * BigInt(15) / BigInt(10),
+              maxFeePerGas: (feeData.maxFeePerGas! * BigInt(12)) / BigInt(10),
+              maxPriorityFeePerGas: (feeData.maxPriorityFeePerGas! * BigInt(15)) / BigInt(10),
             },
             chainId
           ),
@@ -192,13 +202,13 @@ export class GasEstimationManager {
         return {
           slow: this.calculateGasCosts(
             standardGasLimit,
-            { gasPrice: gasPrice * BigInt(8) / BigInt(10) },
+            { gasPrice: (gasPrice * BigInt(8)) / BigInt(10) },
             chainId
           ),
           standard: this.calculateGasCosts(standardGasLimit, feeData, chainId),
           fast: this.calculateGasCosts(
             standardGasLimit,
-            { gasPrice: gasPrice * BigInt(12) / BigInt(10) },
+            { gasPrice: (gasPrice * BigInt(12)) / BigInt(10) },
             chainId
           ),
         };
