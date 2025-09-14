@@ -17,6 +17,8 @@ interface FileUploadProps {
 
 const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
   const { wallet } = useWallet();
+  
+  console.log('FileUpload component rendered, wallet:', wallet);
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -106,8 +108,13 @@ const FileUpload = ({ onRequireWallet }: FileUploadProps) => {
   };
 
   const handleFiles = (fileList: FileList) => {
+    // Debug logging
+    console.log('FileUpload - handleFiles called, wallet:', wallet);
+    console.log('FileUpload - wallet connected?', !!wallet);
+    
     // Check if wallet is connected before processing files
     if (!wallet) {
+      console.log('FileUpload - No wallet detected, showing modal');
       onRequireWallet?.();
       return;
     }
