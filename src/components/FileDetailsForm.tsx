@@ -23,7 +23,9 @@ const formSchema = z.object({
   shortDescription: z.string().min(1, 'Description is required').max(1000, 'Description must be under 1000 characters'),
   categoryTags: z.array(z.string()).optional(),
   creatorName: z.string().min(1, 'Creator name is required'),
+  organizationName: z.string().optional(),
   externalLink: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  externalLink2: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   
   // Keep only essential fields
   mimeType: z.string().optional(),
@@ -54,7 +56,9 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
       shortDescription: '',
       categoryTags: [],
       creatorName: '',
+      organizationName: '',
       externalLink: '',
+      externalLink2: '',
       
       // Essential fields
       mimeType: '',
@@ -216,6 +220,22 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                         )}
                       />
 
+                      {/* Organization Name */}
+                      <FormField
+                        control={form.control}
+                        name="organizationName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Organization Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Company or organization name" {...field} />
+                            </FormControl>
+                            <FormDescription>Optional. Organization associated with this NFT.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       {/* Primary Chain */}
                       <FormField
                         control={form.control}
@@ -294,6 +314,26 @@ const FileDetailsForm: React.FC<FileDetailsFormProps> = ({ onSubmit, onCancel })
                               />
                             </FormControl>
                             <FormDescription>Portfolio, certificate link, previous sale, etc. (Optional)</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* External Link 2 */}
+                      <FormField
+                        control={form.control}
+                        name="externalLink2"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Additional External Link</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="url"
+                                placeholder="https://additional-link.example.com" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormDescription>Additional reference, social media, or related content. (Optional)</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
